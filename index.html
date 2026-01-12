@@ -85,7 +85,7 @@
       <th>Date</th>
       <th>Location</th>
       <th>Engineer</th>
-      <th>Workshop/Onsite</th>
+      <th>WS/OS</th>
       <th>Call Type</th>
       <th>Complaint</th>
       <th>Customer</th>
@@ -199,7 +199,7 @@ function render(rows) {
     tr.appendChild(td(row[19]));  // Call ID
     tr.appendChild(td(row[20]));  // Labour
     tr.appendChild(td(row[21]));  // Distance
-    tr.appendChild(td(row[23]));  // TA+DA
+    tr.appendChild(td(row[25]));  // TA+DA
 
     tbody.appendChild(tr);
   });
@@ -220,3 +220,4 @@ document.getElementById("machine").addEventListener("keydown", e => {
 
 </body>
 </html>
+
