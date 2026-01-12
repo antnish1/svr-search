@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>SVR Portal – Home</title>
+  <style>
+    body { font-family: Arial; padding: 40px; }
+    select, button {
+      padding: 10px;
+      margin-top: 10px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+<h2>SVR Portal</h2>
+
+<label><b>Select Location</b></label>
+<select id="location">
+  <option value="">-- Select --</option>
+  <option value="Branch">Branch</option>
+  <option value="Head Office">Head Office</option>
+</select>
+
+<button onclick="createList()">Create List</button>
+
+<script>
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+
+function createList() {
+  const location = document.getElementById("location").value;
+  if (!location) {
+    alert("Please select location");
+    return;
+  }
+
+  google.script.run
+    .withSuccessHandler(listId => {
+      window.location.href =
+        "index.html?listId=" + encodeURIComponent(listId);
+    })
+    .createList(location);
+}
+</script>
+
+</body>
+</html>
