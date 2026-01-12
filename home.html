@@ -133,11 +133,30 @@ function editList(listId) {
   window.location.href = "edit.html?listId=" + encodeURIComponent(listId);
 }
 
-function pdfList(listId, location) {
-  alert(
-    `PDF Preview\n\nLocation: ${location}\nList ID: ${listId}\n\n(Next step will generate PDF)`
-  );
+function pdfList(listId) {
+  const cb = "pdf_cb_" + Date.now();
+  let script;
+
+  window[cb] = function (res) {
+    if (res.url) {
+      window.open(res.url, "_blank");
+    } else {
+      alert("PDF generation failed");
+    }
+
+    delete window[cb];
+    script.remove();
+  };
+
+  script = document.createElement("script");
+  script.src =
+    `${API_URL}?action=pdf` +
+    `&listId=${encodeURIComponent(listId)}` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(script);
 }
+
 
 /* ================= CREATE LIST ================= */
 
