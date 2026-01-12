@@ -53,6 +53,7 @@ function showLoader(show) {
     show ? "flex" : "none";
 }
 
+<script>
 function search() {
   const machine = document.getElementById("machine").value.trim();
   const from = document.getElementById("from").value;
@@ -65,24 +66,26 @@ function search() {
 
   showLoader(true);
 
-  const url =
+  const callbackName = "jsonpCallback_" + Date.now();
+  window[callbackName] = function (data) {
+    render(data.rows || []);
+    showLoader(false);
+    delete window[callbackName];
+    script.remove();
+  };
+
+  const script = document.createElement("script");
+  script.src =
     `${API_URL}?action=search` +
     `&machine=${encodeURIComponent(machine)}` +
     `&from=${encodeURIComponent(from)}` +
-    `&to=${encodeURIComponent(to)}`;
+    `&to=${encodeURIComponent(to)}` +
+    `&callback=${callbackName}`;
 
-  fetch(url)
-    .then(r => r.json())
-    .then(data => {
-      render(data.rows || []);
-      showLoader(false);
-    })
-    .catch(err => {
-      console.error(err);
-      alert("API error");
-      showLoader(false);
-    });
+  document.body.appendChild(script);
 }
+</script>
+
 
 
 function render(rows) {
@@ -108,5 +111,6 @@ function render(rows) {
 
 </body>
 </html>
+
 
 
