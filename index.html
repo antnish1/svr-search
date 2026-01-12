@@ -28,10 +28,8 @@
 
     tr:hover {
       background: #f0f0f0;
-      cursor: pointer;
     }
 
-    /* ✅ STICKY HEADER */
     thead th {
       position: sticky;
       top: 0;
@@ -39,11 +37,10 @@
       z-index: 2;
     }
 
-    /* ✅ RIGHT ALIGN NUMERIC COLUMNS */
-    td:nth-child(10), /* HMR */
-    td:nth-child(14), /* Labour */
-    td:nth-child(15), /* Distance */
-    td:nth-child(16)  /* TA+DA */ {
+    td:nth-child(10),
+    td:nth-child(14),
+    td:nth-child(15),
+    td:nth-child(16) {
       text-align: right;
     }
 
@@ -65,7 +62,7 @@
 
 <div id="loader">Loading… please wait</div>
 
-<h2>Search Machine</h2>
+<h3 id="listTitle"></h3>
 
 <label>From Date</label>
 <input type="date" id="from">
@@ -77,9 +74,7 @@
 <input type="text" id="machine">
 
 <button onclick="search()">Search</button>
-
 <button onclick="closeCurrentList()">Close the List</button>
-
 
 <table id="table">
   <thead>
@@ -111,17 +106,19 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
+/* ================= LIST ID HANDLING ================= */
 
-
-const urlParams = new URLSearchParams(window.location.search);
-const LIST_ID = urlParams.get("listId");
+const params = new URLSearchParams(window.location.search);
+let LIST_ID = params.get("listId") || sessionStorage.getItem("ACTIVE_LIST_ID");
 
 if (!LIST_ID) {
-  alert("No list selected. Please open from Home page.");
+  window.location.href = "home.html";
 }
 
+sessionStorage.setItem("ACTIVE_LIST_ID", LIST_ID);
+document.getElementById("listTitle").textContent =
+  "Working on List : " + LIST_ID;
 
-  
 /* ================= INIT ================= */
 
 document.getElementById("from").value = "2025-12-01";
@@ -133,7 +130,7 @@ function showLoader(show) {
     show ? "flex" : "none";
 }
 
-/* ================= SEARCH (JSONP) ================= */
+/* ================= SEARCH ================= */
 
 function search() {
   const machine = document.getElementById("machine").value.trim();
@@ -141,22 +138,25 @@ function search() {
   const to = document.getElementById("to").value;
 
   if (!machine) {
-    alert("Please enter Machine Number");
+    alert("Enter machine number");
     return;
   }
 
   showLoader(true);
 
-  const callbackName = "jsonp_cb_" + Date.now();
+  const cb = "search_cb_" + Date.now();
   let script;
 
-  window[callbackName] = function (data) {
+  window[cb] = function (data) {
     render(data.rows || []);
-    showLoader(false);
-
-    delete window[callbackName];
-    if (script) script.remove();
+    cleanup();
   };
+
+  function cleanup() {
+    showLoader(false);
+    delete window[cb];
+    if (script) script.remove();
+  }
 
   script = document.createElement("script");
   script.src =
@@ -164,18 +164,16 @@ function search() {
     `&machine=${encodeURIComponent(machine)}` +
     `&from=${encodeURIComponent(from)}` +
     `&to=${encodeURIComponent(to)}` +
-    `&callback=${callbackName}`;
+    `&callback=${cb}`;
 
   document.body.appendChild(script);
 }
 
 /* ================= RENDER ================= */
 
-function formatDate(value) {
-  if (!value) return "";
-  const d = new Date(value);
-  if (isNaN(d)) return "";
-  return d.toLocaleDateString("en-GB"); // DD/MM/YYYY
+function formatDate(v) {
+  const d = new Date(v);
+  return isNaN(d) ? "" : d.toLocaleDateString("en-GB");
 }
 
 function render(rows) {
@@ -183,104 +181,98 @@ function render(rows) {
   tbody.innerHTML = "";
 
   if (!rows.length) {
-    tbody.innerHTML =
-      "<tr><td colspan='16'>No records found</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='16'>No records found</td></tr>";
     return;
   }
 
-  rows.forEach((row, index) => {
+  rows.forEach(row => {
     const tr = document.createElement("tr");
 
-    // Checkbox
-    const cbTd = document.createElement("td");
     const cb = document.createElement("input");
     cb.type = "checkbox";
+    cb.onchange = () => saveRow(row, cb);
 
-
-    cb.addEventListener("change", () => {
-      if (cb.checked) {
-        const svrNo = prompt("ENTER SVR NUMBER");
-        if (!svrNo) {
-          cb.checked = false;
-          return;
-        }
-    
-        const callbackName = "save_cb_" + Date.now();
-        let script;
-    
-        window[callbackName] = function () {
-          alert("SVR saved");
-          delete window[callbackName];
-          script.remove();
-        };
-    
-        script = document.createElement("script");
-        script.src =
-          `${API_URL}?action=save` +
-          `&listId=${encodeURIComponent(LIST_ID)}` +
-          `&svrNo=${encodeURIComponent(svrNo)}` +
-          `&row=${encodeURIComponent(JSON.stringify(row))}` +
-          `&callback=${callbackName}`;
-    
-        document.body.appendChild(script);
-      }
-    });
-
-    
-    cb.dataset.index = index;
-    cbTd.appendChild(cb);
-    tr.appendChild(cbTd);
-
-    tr.appendChild(td(formatDate(row[26]))); // Date
-    tr.appendChild(td(row[0]));   // Location
-    tr.appendChild(td(row[1]));   // Engineer
-    tr.appendChild(td(row[2]));   // Workshop/Onsite
-    tr.appendChild(td(row[3]));   // Call Type
-    tr.appendChild(td(row[5]));   // Complaint
-    tr.appendChild(td(row[6]));   // Customer
-    tr.appendChild(td(row[8]));   // Machine
-    tr.appendChild(td(row[9]));   // HMR
-    tr.appendChild(td(row[10]));  // Status
-    tr.appendChild(td(row[14]));  // Site Location
-    tr.appendChild(td(row[19]));  // Call ID
-    tr.appendChild(td(row[20]));  // Labour
-    tr.appendChild(td(row[21]));  // Distance
-    tr.appendChild(td(row[25]));  // TA+DA
+    tr.appendChild(td(cb));
+    tr.appendChild(td(formatDate(row[26])));
+    tr.appendChild(td(row[0]));
+    tr.appendChild(td(row[1]));
+    tr.appendChild(td(row[2]));
+    tr.appendChild(td(row[3]));
+    tr.appendChild(td(row[5]));
+    tr.appendChild(td(row[6]));
+    tr.appendChild(td(row[8]));
+    tr.appendChild(td(row[9]));
+    tr.appendChild(td(row[10]));
+    tr.appendChild(td(row[14]));
+    tr.appendChild(td(row[19]));
+    tr.appendChild(td(row[20]));
+    tr.appendChild(td(row[21]));
+    tr.appendChild(td(row[25]));
 
     tbody.appendChild(tr);
   });
 }
 
+function td(content) {
+  const td = document.createElement("td");
+  if (content instanceof HTMLElement) td.appendChild(content);
+  else td.textContent = content ?? "";
+  return td;
+}
 
-function closeCurrentList() {
-  if (!confirm("Are you sure you want to close this list?")) return;
+/* ================= SAVE ROW ================= */
 
-  const callbackName = "close_cb_" + Date.now();
+function saveRow(row, checkbox) {
+  if (!checkbox.checked) return;
+
+  const svrNo = prompt("ENTER SVR NUMBER");
+  if (!svrNo) {
+    checkbox.checked = false;
+    return;
+  }
+
+  const cb = "save_cb_" + Date.now();
   let script;
 
-  window[callbackName] = function () {
-    alert("List closed successfully");
-    delete window[callbackName];
+  window[cb] = function () {
+    alert("SVR saved");
+    delete window[cb];
     script.remove();
+  };
+
+  script = document.createElement("script");
+  script.src =
+    `${API_URL}?action=saveRow` +
+    `&listId=${encodeURIComponent(LIST_ID)}` +
+    `&svrNo=${encodeURIComponent(svrNo)}` +
+    `&row=${encodeURIComponent(JSON.stringify(row))}` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(script);
+}
+
+/* ================= CLOSE LIST ================= */
+
+function closeCurrentList() {
+  if (!confirm("Close this list?")) return;
+
+  const cb = "close_cb_" + Date.now();
+  let script;
+
+  window[cb] = function () {
+    alert("List closed");
+    sessionStorage.removeItem("ACTIVE_LIST_ID");
     window.location.href = "home.html";
   };
 
   script = document.createElement("script");
   script.src =
-    `${API_URL}?action=close&listId=${encodeURIComponent(LIST_ID)}&callback=${callbackName}`;
+    `${API_URL}?action=closeList` +
+    `&listId=${encodeURIComponent(LIST_ID)}` +
+    `&callback=${cb}`;
 
   document.body.appendChild(script);
 }
-
-
-  
-function td(text) {
-  const td = document.createElement("td");
-  td.textContent = text ?? "";
-  return td;
-}
-
-/* ================= ENTER KEY ================= */
 
 document.getElementById("machine").addEventListener("keydown", e => {
   if (e.key === "Enter") search();
@@ -289,5 +281,3 @@ document.getElementById("machine").addEventListener("keydown", e => {
 
 </body>
 </html>
-
-
