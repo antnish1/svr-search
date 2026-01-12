@@ -5,15 +5,38 @@
   <title>SVR Search</title>
 
   <style>
-    body { font-family: Arial; padding: 20px; }
-    input, button { padding: 8px; margin: 5px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-    td { border: 1px solid #ccc; padding: 6px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    input, button {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    td {
+      border: 1px solid #ccc;
+      padding: 6px;
+    }
+
+    tr:hover {
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+
     #loader {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(255,255,255,.85);
+      background: rgba(255,255,255,0.85);
+      z-index: 9999;
       font-size: 18px;
       font-weight: bold;
       align-items: center;
@@ -24,7 +47,7 @@
 
 <body>
 
-<div id="loader">Loading…</div>
+<div id="loader">Loading… please wait</div>
 
 <h2>Search Machine</h2>
 
@@ -42,34 +65,53 @@
 <table id="table"></table>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+/* =====================================================
+   CONFIG
+   ===================================================== */
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+
+/* =====================================================
+   INIT
+   ===================================================== */
 
 document.getElementById("from").value = "2025-12-01";
 document.getElementById("to").value =
   new Date().toISOString().split("T")[0];
+
+/* =====================================================
+   UI HELPERS
+   ===================================================== */
 
 function showLoader(show) {
   document.getElementById("loader").style.display =
     show ? "flex" : "none";
 }
 
-<script>
+/* =====================================================
+   SEARCH (JSONP)
+   ===================================================== */
+
 function search() {
   const machine = document.getElementById("machine").value.trim();
   const from = document.getElementById("from").value;
   const to = document.getElementById("to").value;
 
   if (!machine) {
-    alert("Enter machine number");
+    alert("Please enter Machine Number");
     return;
   }
 
   showLoader(true);
 
-  const callbackName = "jsonpCallback_" + Date.now();
+  const callbackName = "jsonp_cb_" + Date.now();
+
   window[callbackName] = function (data) {
     render(data.rows || []);
     showLoader(false);
+
+    // cleanup
     delete window[callbackName];
     script.remove();
   };
@@ -84,9 +126,10 @@ function search() {
 
   document.body.appendChild(script);
 }
-</script>
 
-
+/* =====================================================
+   RENDER TABLE
+   ===================================================== */
 
 function render(rows) {
   const table = document.getElementById("table");
@@ -97,20 +140,27 @@ function render(rows) {
     return;
   }
 
-  rows.forEach(r => {
+  rows.forEach(row => {
     const tr = document.createElement("tr");
-    r.forEach(c => {
+
+    row.forEach(cell => {
       const td = document.createElement("td");
-      td.textContent = c;
+      td.textContent = cell;
       tr.appendChild(td);
     });
+
     table.appendChild(tr);
   });
 }
+
+/* =====================================================
+   ENTER KEY SUPPORT
+   ===================================================== */
+
+document.getElementById("machine").addEventListener("keydown", e => {
+  if (e.key === "Enter") search();
+});
 </script>
 
 </body>
 </html>
-
-
-
