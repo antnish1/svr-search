@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Edit SVR List</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #f3f3f3;
+      position: sticky;
+      top: 0;
+    }
+
+    button {
+      padding: 6px 10px;
+      margin: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2 id="title"></h2>
+
+<button onclick="goHome()">⬅ Back to Home</button>
+
+<table>
+  <thead>
+    <tr>
+      <th>SVR No</th>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Engineer</th>
+      <th>Machine No</th>
+      <th>HMR</th>
+      <th>Labour</th>
+      <th>TA+DA</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+/* ================= CONFIG ================= */
+
+const API_URL =
+  "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+
+/* ================= LIST ID ================= */
+
+const params = new URLSearchParams(window.location.search);
+const LIST_ID = params.get("listId");
+
+if (!LIST_ID) {
+  window.location.href = "home.html";
+}
+
+document.getElementById("title").textContent =
+  "Editing List : " + LIST_ID;
+
+/* ================= LOAD ROWS ================= */
+
+loadRows();
+
+function loadRows() {
+  const cb = "rows_cb_" + Date.now();
+  let script;
+
+  window[cb] = function (data) {
+    render(data);
+    delete window[cb];
+    script.remove();
+  };
+
+  script = document.createElement("script");
+  script.src =
+    `${API_URL}?action=getListRows` +
+    `&listId=${encodeURIComponent(LIST_ID)}` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(script);
+}
+
+/* ================= RENDER ================= */
+
+function render(items) {
+  const tbody = document.getElementById("tbody");
+  tbody.innerHTML = "";
+
+  if (!items.length) {
+    tbody.innerHTML =
+      "<tr><td colspan='9'>No rows in this list</td></tr>";
+    return;
+  }
+
+  items.forEach(o => {
+    const r = o.row;
+
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${r[1]}</td>
+      <td>${formatDate(r[28])}</td>
+      <td>${r[3]}</td>
+      <td>${r[4]}</td>
+      <td>${r[10]}</td>
+      <td>${r[11]}</td>
+      <td>${r[21]}</td>
+      <td>${r[26]}</td>
+      <td>
+        <button onclick="deleteRow(${o.index})">Delete</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+function formatDate(v) {
+  const d = new Date(v);
+  return isNaN(d) ? "" : d.toLocaleDateString("en-GB");
+}
+
+/* ================= DELETE ================= */
+
+function deleteRow(rowIndex) {
+  if (!confirm("Delete this row permanently?")) return;
+
+  const cb = "del_cb_" + Date.now();
+  let script;
+
+  window[cb] = function () {
+    alert("Row deleted");
+    loadRows();
+    delete window[cb];
+    script.remove();
+  };
+
+  script = document.createElement("script");
+  script.src =
+    `${API_URL}?action=deleteRow` +
+    `&rowIndex=${rowIndex}` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(script);
+}
+
+/* ================= NAV ================= */
+
+function goHome() {
+  window.location.href = "home.html";
+}
+</script>
+
+</body>
+</html>
