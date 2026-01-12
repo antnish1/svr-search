@@ -134,27 +134,10 @@ function editList(listId) {
 }
 
 function pdfList(listId) {
-  const cb = "pdf_cb_" + Date.now();
-  let script;
+  const url =
+    API_URL + "?action=preview&listId=" + encodeURIComponent(listId);
 
-  window[cb] = function (url) {
-    if (url && typeof url === "string") {
-      window.open(url, "_blank");
-    } else {
-      alert("PDF generation failed");
-    }
-
-    delete window[cb];
-    script.remove();
-  };
-
-  script = document.createElement("script");
-  script.src =
-    `${API_URL}?action=pdf` +
-    `&listId=${encodeURIComponent(listId)}` +
-    `&callback=${cb}`;
-
-  document.body.appendChild(script);
+  window.open(url, "_blank");
 }
 
 
