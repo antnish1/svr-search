@@ -137,9 +137,9 @@ function pdfList(listId) {
   const cb = "pdf_cb_" + Date.now();
   let script;
 
-  window[cb] = function (res) {
-    if (res.url) {
-      window.open(res.url, "_blank");
+  window[cb] = function (url) {
+    if (url && typeof url === "string") {
+      window.open(url, "_blank");
     } else {
       alert("PDF generation failed");
     }
@@ -156,6 +156,7 @@ function pdfList(listId) {
 
   document.body.appendChild(script);
 }
+
 
 
 /* ================= CREATE LIST ================= */
