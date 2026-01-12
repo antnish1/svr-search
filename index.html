@@ -78,6 +78,9 @@
 
 <button onclick="search()">Search</button>
 
+<button onclick="closeCurrentList()">Close the List</button>
+
+
 <table id="table">
   <thead>
     <tr>
@@ -108,6 +111,17 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
+
+
+const urlParams = new URLSearchParams(window.location.search);
+const LIST_ID = urlParams.get("listId");
+
+if (!LIST_ID) {
+  alert("No list selected. Please open from Home page.");
+}
+
+
+  
 /* ================= INIT ================= */
 
 document.getElementById("from").value = "2025-12-01";
@@ -181,6 +195,38 @@ function render(rows) {
     const cbTd = document.createElement("td");
     const cb = document.createElement("input");
     cb.type = "checkbox";
+
+
+    cb.addEventListener("change", () => {
+      if (cb.checked) {
+        const svrNo = prompt("ENTER SVR NUMBER");
+        if (!svrNo) {
+          cb.checked = false;
+          return;
+        }
+    
+        const callbackName = "save_cb_" + Date.now();
+        let script;
+    
+        window[callbackName] = function () {
+          alert("SVR saved");
+          delete window[callbackName];
+          script.remove();
+        };
+    
+        script = document.createElement("script");
+        script.src =
+          `${API_URL}?action=save` +
+          `&listId=${encodeURIComponent(LIST_ID)}` +
+          `&svrNo=${encodeURIComponent(svrNo)}` +
+          `&row=${encodeURIComponent(JSON.stringify(row))}` +
+          `&callback=${callbackName}`;
+    
+        document.body.appendChild(script);
+      }
+    });
+
+    
     cb.dataset.index = index;
     cbTd.appendChild(cb);
     tr.appendChild(cbTd);
@@ -205,6 +251,29 @@ function render(rows) {
   });
 }
 
+
+function closeCurrentList() {
+  if (!confirm("Are you sure you want to close this list?")) return;
+
+  const callbackName = "close_cb_" + Date.now();
+  let script;
+
+  window[callbackName] = function () {
+    alert("List closed successfully");
+    delete window[callbackName];
+    script.remove();
+    window.location.href = "home.html";
+  };
+
+  script = document.createElement("script");
+  script.src =
+    `${API_URL}?action=close&listId=${encodeURIComponent(LIST_ID)}&callback=${callbackName}`;
+
+  document.body.appendChild(script);
+}
+
+
+  
 function td(text) {
   const td = document.createElement("td");
   td.textContent = text ?? "";
@@ -220,4 +289,5 @@ document.getElementById("machine").addEventListener("keydown", e => {
 
 </body>
 </html>
+
 
