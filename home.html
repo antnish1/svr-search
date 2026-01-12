@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>SVR Portal – Home</title>
+  <meta charset="utf-8">
+  <title>SVR Portal - Home</title>
+
   <style>
-    body { font-family: Arial; padding: 40px; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+
     select, button {
       padding: 10px;
       margin-top: 10px;
       display: block;
+      width: 250px;
     }
   </style>
 </head>
@@ -28,19 +35,35 @@
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
+/* ================= CREATE LIST ================= */
+
 function createList() {
   const location = document.getElementById("location").value;
+
   if (!location) {
     alert("Please select location");
     return;
   }
 
-  google.script.run
-    .withSuccessHandler(listId => {
-      window.location.href =
-        "index.html?listId=" + encodeURIComponent(listId);
-    })
-    .createList(location);
+  const callbackName = "create_cb_" + Date.now();
+  let script;
+
+  window[callbackName] = function (listId) {
+    sessionStorage.setItem("ACTIVE_LIST_ID", listId);
+    delete window[callbackName];
+    script.remove();
+
+    window.location.href =
+      "index.html?listId=" + encodeURIComponent(listId);
+  };
+
+  script = document.createElement("script");
+  script.src =
+    `${API_URL}?action=createList` +
+    `&location=${encodeURIComponent(location)}` +
+    `&callback=${callbackName}`;
+
+  document.body.appendChild(script);
 }
 </script>
 
