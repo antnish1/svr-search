@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SVR Search</title>
+
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { padding: 8px; margin: 5px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    td { border: 1px solid #ccc; padding: 6px; }
+    #loader {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.85);
+      font-size: 18px;
+      font-weight: bold;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="loader">Loading…</div>
+
+<h2>Search Machine</h2>
+
+<label>From Date</label>
+<input type="date" id="from">
+
+<label>To Date</label>
+<input type="date" id="to"><br>
+
+<label>Machine Number</label>
+<input type="text" id="machine">
+
+<button onclick="search()">Search</button>
+
+<table id="table"></table>
+
+<script>
+const API_URL = "https://script.googleusercontent.com/macros/echo?user_content_key=AehSKLgw6MhOVVaEWil6Yykp-NgZE9I3rCFtcfUUqQUxkgqM2EoNxIhGBe-0bNFXwQS5mlW0bKfzN-m83C9WDhdS6DS8XvEPKrWVAPOL27mJJVCAXeWW4d6Zlcc3u49pOFnWRIc8_1Rxe4ALGmc2YLgHl5urrAOM-QttnXo47nwfJcVEpVHcZzLmhohd4oaf2mpWDvCFZNiAlj2VBneZAlVY2B3Ot46pRkuceKaHwQS0-4DeNl4SHdxkGnMS2zVsl6Mtsmcha0EcoAm1SMfcZj6NwqSiB4Qlbw&lib=M5t2JeRXNWBjQCZF5P8_yj1lj5Tt-xhKE";
+
+document.getElementById("from").value = "2025-12-01";
+document.getElementById("to").value =
+  new Date().toISOString().split("T")[0];
+
+function showLoader(show) {
+  document.getElementById("loader").style.display =
+    show ? "flex" : "none";
+}
+
+function search() {
+  const machine = document.getElementById("machine").value.trim();
+  const from = document.getElementById("from").value;
+  const to = document.getElementById("to").value;
+
+  if (!machine) {
+    alert("Enter machine number");
+    return;
+  }
+
+  showLoader(true);
+
+  fetch(`${API_URL}?action=search&machine=${machine}&from=${from}&to=${to}`)
+    .then(r => r.json())
+    .then(data => {
+      render(data.rows || []);
+      showLoader(false);
+    })
+    .catch(err => {
+      console.error(err);
+      alert("API error");
+      showLoader(false);
+    });
+}
+
+function render(rows) {
+  const table = document.getElementById("table");
+  table.innerHTML = "";
+
+  if (!rows.length) {
+    table.innerHTML = "<tr><td>No records found</td></tr>";
+    return;
+  }
+
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    r.forEach(c => {
+      const td = document.createElement("td");
+      td.textContent = c;
+      tr.appendChild(td);
+    });
+    table.appendChild(tr);
+  });
+}
+</script>
+
+</body>
+</html>
