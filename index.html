@@ -65,7 +65,13 @@ function search() {
 
   showLoader(true);
 
-  fetch(`${API_URL}?action=search&machine=${machine}&from=${from}&to=${to}`)
+  const url =
+    `${API_URL}?action=search` +
+    `&machine=${encodeURIComponent(machine)}` +
+    `&from=${encodeURIComponent(from)}` +
+    `&to=${encodeURIComponent(to)}`;
+
+  fetch(url)
     .then(r => r.json())
     .then(data => {
       render(data.rows || []);
@@ -77,6 +83,7 @@ function search() {
       showLoader(false);
     });
 }
+
 
 function render(rows) {
   const table = document.getElementById("table");
@@ -101,4 +108,5 @@ function render(rows) {
 
 </body>
 </html>
+
 
