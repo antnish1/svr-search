@@ -5,31 +5,11 @@
   <title>SVR Search</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
-
-    input, button {
-      padding: 8px;
-      margin: 5px;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 15px;
-    }
-
-    td {
-      border: 1px solid #ccc;
-      padding: 6px;
-    }
-
-    tr:hover {
-      background: #f0f0f0;
-      cursor: pointer;
-    }
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    input, button { padding: 8px; margin: 5px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
+    td { border: 1px solid #ccc; padding: 6px; }
+    tr:hover { background: #f0f0f0; cursor: pointer; }
 
     #loader {
       display: none;
@@ -65,33 +45,23 @@
 <table id="table"></table>
 
 <script>
-/* =====================================================
-   CONFIG
-   ===================================================== */
+/* ================= CONFIG ================= */
 
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
-/* =====================================================
-   INIT
-   ===================================================== */
+/* ================= INIT ================= */
 
 document.getElementById("from").value = "2025-12-01";
 document.getElementById("to").value =
   new Date().toISOString().split("T")[0];
-
-/* =====================================================
-   UI HELPERS
-   ===================================================== */
 
 function showLoader(show) {
   document.getElementById("loader").style.display =
     show ? "flex" : "none";
 }
 
-/* =====================================================
-   SEARCH (JSONP)
-   ===================================================== */
+/* ================= SEARCH (JSONP) ================= */
 
 function search() {
   const machine = document.getElementById("machine").value.trim();
@@ -106,17 +76,17 @@ function search() {
   showLoader(true);
 
   const callbackName = "jsonp_cb_" + Date.now();
+  let script; // ✅ DECLARED FIRST
 
   window[callbackName] = function (data) {
     render(data.rows || []);
     showLoader(false);
 
-    // cleanup
     delete window[callbackName];
-    script.remove();
+    if (script) script.remove();
   };
 
-  const script = document.createElement("script");
+  script = document.createElement("script");
   script.src =
     `${API_URL}?action=search` +
     `&machine=${encodeURIComponent(machine)}` +
@@ -127,9 +97,7 @@ function search() {
   document.body.appendChild(script);
 }
 
-/* =====================================================
-   RENDER TABLE
-   ===================================================== */
+/* ================= RENDER ================= */
 
 function render(rows) {
   const table = document.getElementById("table");
@@ -142,20 +110,16 @@ function render(rows) {
 
   rows.forEach(row => {
     const tr = document.createElement("tr");
-
     row.forEach(cell => {
       const td = document.createElement("td");
       td.textContent = cell;
       tr.appendChild(td);
     });
-
     table.appendChild(tr);
   });
 }
 
-/* =====================================================
-   ENTER KEY SUPPORT
-   ===================================================== */
+/* ================= ENTER KEY ================= */
 
 document.getElementById("machine").addEventListener("keydown", e => {
   if (e.key === "Enter") search();
