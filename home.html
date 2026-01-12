@@ -2,27 +2,48 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>SVR Portal - Home</title>
+  <title>SVR Portal – Home</title>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 40px;
-    }
+    body { font-family: Arial; padding: 30px; }
 
     select, button {
-      padding: 10px;
-      margin-top: 10px;
-      display: block;
-      width: 250px;
+      padding: 8px;
+      margin: 5px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+
+    th {
+      background: #f3f3f3;
+    }
+
+    button.action {
+      padding: 5px 10px;
+      margin: 2px;
     }
   </style>
 </head>
+
 <body>
 
 <h2>SVR Portal</h2>
 
-<label><b>Select Location</b></label>
+<!-- ================= CREATE LIST ================= -->
+
+<h3>Create New List</h3>
+
+<label>Select Location</label>
 <select id="location">
   <option value="">-- Select --</option>
   <option value="Branch">Branch</option>
@@ -31,37 +52,115 @@
 
 <button onclick="createList()">Create List</button>
 
+<!-- ================= LIST TABLE ================= -->
+
+<h3>Existing Lists</h3>
+
+<table id="listTable">
+  <thead>
+    <tr>
+      <th>List ID</th>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Status</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
 <script>
 const API_URL =
   "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+
+/* ================= LOAD LISTS ================= */
+
+loadLists();
+
+function loadLists() {
+  const cb = "lists_cb_" + Date.now();
+  let script;
+
+  window[cb] = function (data) {
+    renderLists(data);
+    delete window[cb];
+    script.remove();
+  };
+
+  script = document.createElement("script");
+  script.src = `${API_URL}?action=getLists&callback=${cb}`;
+  document.body.appendChild(script);
+}
+
+/* ================= RENDER LISTS ================= */
+
+function renderLists(lists) {
+  const tbody = document.querySelector("#listTable tbody");
+  tbody.innerHTML = "";
+
+  if (!lists.length) {
+    tbody.innerHTML = "<tr><td colspan='5'>No lists found</td></tr>";
+    return;
+  }
+
+  lists.forEach(l => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${l.listId}</td>
+      <td>${l.date}</td>
+      <td>${l.location}</td>
+      <td>${l.status}</td>
+      <td>
+        <button class="action" onclick="openList('${l.listId}')">Open</button>
+        <button class="action" onclick="editList('${l.listId}')">Edit</button>
+        <button class="action" onclick="pdfList('${l.listId}','${l.location}')">PDF</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================= ACTIONS ================= */
+
+function openList(listId) {
+  sessionStorage.setItem("ACTIVE_LIST_ID", listId);
+  window.location.href = "index.html?listId=" + encodeURIComponent(listId);
+}
+
+function editList(listId) {
+  window.location.href = "edit.html?listId=" + encodeURIComponent(listId);
+}
+
+function pdfList(listId, location) {
+  alert(
+    `PDF Preview\n\nLocation: ${location}\nList ID: ${listId}\n\n(Next step will generate PDF)`
+  );
+}
 
 /* ================= CREATE LIST ================= */
 
 function createList() {
   const location = document.getElementById("location").value;
-
   if (!location) {
     alert("Please select location");
     return;
   }
 
-  const callbackName = "create_cb_" + Date.now();
+  const cb = "create_cb_" + Date.now();
   let script;
 
-  window[callbackName] = function (listId) {
+  window[cb] = function (listId) {
     sessionStorage.setItem("ACTIVE_LIST_ID", listId);
-    delete window[callbackName];
-    script.remove();
-
-    window.location.href =
-      "index.html?listId=" + encodeURIComponent(listId);
+    window.location.href = "index.html?listId=" + encodeURIComponent(listId);
   };
 
   script = document.createElement("script");
   script.src =
     `${API_URL}?action=createList` +
     `&location=${encodeURIComponent(location)}` +
-    `&callback=${callbackName}`;
+    `&callback=${cb}`;
 
   document.body.appendChild(script);
 }
