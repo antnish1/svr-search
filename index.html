@@ -5,11 +5,47 @@
   <title>SVR Search</title>
 
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    input, button { padding: 8px; margin: 5px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 15px; }
-    td { border: 1px solid #ccc; padding: 6px; }
-    tr:hover { background: #f0f0f0; cursor: pointer; }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+    }
+
+    input, button {
+      padding: 8px;
+      margin: 5px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 15px;
+    }
+
+    th, td {
+      border: 1px solid #ccc;
+      padding: 6px;
+    }
+
+    tr:hover {
+      background: #f0f0f0;
+      cursor: pointer;
+    }
+
+    /* ✅ STICKY HEADER */
+    thead th {
+      position: sticky;
+      top: 0;
+      background: #f9f9f9;
+      z-index: 2;
+    }
+
+    /* ✅ RIGHT ALIGN NUMERIC COLUMNS */
+    td:nth-child(10), /* HMR */
+    td:nth-child(14), /* Labour */
+    td:nth-child(15), /* Distance */
+    td:nth-child(16)  /* TA+DA */ {
+      text-align: right;
+    }
 
     #loader {
       display: none;
@@ -42,7 +78,29 @@
 
 <button onclick="search()">Search</button>
 
-<table id="table"></table>
+<table id="table">
+  <thead>
+    <tr>
+      <th>Select</th>
+      <th>Date</th>
+      <th>Location</th>
+      <th>Engineer</th>
+      <th>Workshop/Onsite</th>
+      <th>Call Type</th>
+      <th>Complaint</th>
+      <th>Customer</th>
+      <th>Machine No</th>
+      <th>HMR</th>
+      <th>Status</th>
+      <th>Site Location</th>
+      <th>Call ID</th>
+      <th>Labour</th>
+      <th>Distance</th>
+      <th>TA+DA</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
 
 <script>
 /* ================= CONFIG ================= */
@@ -76,7 +134,7 @@ function search() {
   showLoader(true);
 
   const callbackName = "jsonp_cb_" + Date.now();
-  let script; // ✅ DECLARED FIRST
+  let script;
 
   window[callbackName] = function (data) {
     render(data.rows || []);
@@ -99,24 +157,58 @@ function search() {
 
 /* ================= RENDER ================= */
 
+function formatDate(value) {
+  if (!value) return "";
+  const d = new Date(value);
+  if (isNaN(d)) return "";
+  return d.toLocaleDateString("en-GB"); // DD/MM/YYYY
+}
+
 function render(rows) {
-  const table = document.getElementById("table");
-  table.innerHTML = "";
+  const tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
 
   if (!rows.length) {
-    table.innerHTML = "<tr><td>No records found</td></tr>";
+    tbody.innerHTML =
+      "<tr><td colspan='16'>No records found</td></tr>";
     return;
   }
 
-  rows.forEach(row => {
+  rows.forEach((row, index) => {
     const tr = document.createElement("tr");
-    row.forEach(cell => {
-      const td = document.createElement("td");
-      td.textContent = cell;
-      tr.appendChild(td);
-    });
-    table.appendChild(tr);
+
+    // Checkbox
+    const cbTd = document.createElement("td");
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.dataset.index = index;
+    cbTd.appendChild(cb);
+    tr.appendChild(cbTd);
+
+    tr.appendChild(td(formatDate(row[26]))); // Date
+    tr.appendChild(td(row[0]));   // Location
+    tr.appendChild(td(row[1]));   // Engineer
+    tr.appendChild(td(row[2]));   // Workshop/Onsite
+    tr.appendChild(td(row[3]));   // Call Type
+    tr.appendChild(td(row[5]));   // Complaint
+    tr.appendChild(td(row[6]));   // Customer
+    tr.appendChild(td(row[8]));   // Machine
+    tr.appendChild(td(row[9]));   // HMR
+    tr.appendChild(td(row[10]));  // Status
+    tr.appendChild(td(row[14]));  // Site Location
+    tr.appendChild(td(row[19]));  // Call ID
+    tr.appendChild(td(row[20]));  // Labour
+    tr.appendChild(td(row[21]));  // Distance
+    tr.appendChild(td(row[23]));  // TA+DA
+
+    tbody.appendChild(tr);
   });
+}
+
+function td(text) {
+  const td = document.createElement("td");
+  td.textContent = text ?? "";
+  return td;
 }
 
 /* ================= ENTER KEY ================= */
