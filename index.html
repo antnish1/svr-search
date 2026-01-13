@@ -401,8 +401,6 @@ function saveSVR() {
 
 let confirmAction = null;
 
-/* ===== CONFIRM MODAL (FIXED) ===== */
-
 function showConfirm(message, onYes) {
   modalText.innerText = message;
   confirmAction = onYes;
@@ -423,6 +421,7 @@ function confirmYes() {
     action();
   }
 }
+
 
 /* ===== TOP BAR ACTIONS ===== */
 
@@ -478,6 +477,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
