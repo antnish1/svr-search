@@ -269,6 +269,18 @@ function render(rows) {
 
 
 
+function openSVRModal(cb, rowJson) {
+  if (!cb.checked) return;
+
+  pendingRow = JSON.parse(decodeURIComponent(rowJson));
+  pendingCheckbox = cb;
+
+  document.getElementById("svrInput").value = "";
+  document.getElementById("svrModal").style.display = "flex";
+}
+
+  
+
 function closeSVRModal() {
   svrModal.style.display = "none";
 
@@ -353,6 +365,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
