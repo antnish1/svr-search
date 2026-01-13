@@ -297,8 +297,25 @@ function render(rows) {
     const machine = String(r[8]).trim();
     
     // ✅ FINAL DUPLICATE KEY
+    const d = new Date(r[26]); // AA from CONSOLIDATION
+    const dateKey = isNaN(d)
+      ? ""
+      : d.toISOString().slice(0, 10);
+    
+    const engineer = String(r[1] || "")
+      .trim()
+      .toUpperCase();
+    
+    const machine = String(r[8] || "")
+      .replace(/\.0$/, "")
+      .trim();
+    
     const key = `${dateKey}|${engineer}|${machine}`;
-    const isProcessed = !!processedKeys[key];
+    
+    const isProcessed = processedKeys[key] === true;
+    
+    console.log("CHECK KEY:", key, processedKeys[key]);
+
 
 
     /* ===== SELECT CHECKBOX ===== */
@@ -585,6 +602,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
