@@ -172,9 +172,13 @@ let pendingRow = null;
 let pendingCheckbox = null;
 let processedKeys = {};
 
-  
+const loader = document.getElementById("loader"); 
 const modal = document.getElementById("modal");
 const modalText = document.getElementById("modal-text");
+const svrModal = document.getElementById("svrModal");
+const svrInput = document.getElementById("svrInput");
+const svrError = document.getElementById("svrError");
+
 
   
 const API_URL =
@@ -395,78 +399,80 @@ function saveSVR() {
 
 
 let confirmAction = null;
-function closeList() {
-  confirmAction = () => {
-    showLoader(true);
-
-    const cb = "close_" + Date.now();
-    let s;
-
-    window[cb] = function () {
-      showLoader(false);
-      sessionStorage.removeItem("ACTIVE_LIST_ID");
-      delete window[cb];
-      s.remove();
-      location.href = "home.html";
-    };
-
-    s = document.createElement("script");
-    s.src =
-      `${API_URL}?action=closeList` +
-      `&listId=${encodeURIComponent(LIST_ID)}` +
-      `&callback=${cb}`;
-
-    document.body.appendChild(s);
-  };
-
-  showModal("Close this list?");
+function showConfirm(message, onYes) {
+  modalText.innerText = message;
+  confirmAction = onYes;
+  modal.style.display = "flex";
 }
 
+function closeModal() {
+  modal.style.display = "none";
+  confirmAction = null;
+}
+
+function confirmYes() {
+  modal.style.display = "none";
+  if (confirmAction) {
+    const action = confirmAction;
+    confirmAction = null;
+    action();
+  }
+}
 
 function goBack() {
-  confirmAction = () => {
-    showLoader(true);
+  showConfirm(
+    "Are you sure you want to close this list?",
+    () => location.href = "home.html"
+  );
+}
+  
+function closeList() {
+  showConfirm(
+    "Are you sure you want to close this list?",
+    closeListConfirmed
+  );
+}  
+  
 
-    const cb = "close_back_" + Date.now();
-    let s;
+function closeListConfirmed() {
+  showLoader(true);
 
-    window[cb] = function () {
-      showLoader(false);
-      sessionStorage.removeItem("ACTIVE_LIST_ID");
-      delete window[cb];
-      s.remove();
-      location.href = "home.html";
-    };
+  const cb = "close_" + Date.now();
+  let s;
 
-    s = document.createElement("script");
-    s.src =
-      `${API_URL}?action=closeList` +
-      `&listId=${encodeURIComponent(LIST_ID)}` +
-      `&callback=${cb}`;
-
-    document.body.appendChild(s);
+  window[cb] = () => {
+    showLoader(false);
+    sessionStorage.removeItem("ACTIVE_LIST_ID");
+    location.href = "home.html";
+    delete window[cb];
+    s.remove();
   };
 
-  showModal("Close list and go home?");
+  s = document.createElement("script");
+  s.src =
+    `${API_URL}?action=closeList` +
+    `&listId=${encodeURIComponent(LIST_ID)}` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(s);
 }
 
-function confirmYes() { closeModal(); if (confirmAction) confirmAction(); }
 
+  
 function showLoader(s) { loader.style.display = s ? "flex" : "none"; }
 function showModal(message) {
   modalText.innerText = message;
   modal.style.display = "flex";
 }
 
-function closeModal() {
-  modal.style.display = "none";
-}
+
 
 function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateString("en-GB"); }
 </script>
 
 </body>
 </html>
+
 
 
 
