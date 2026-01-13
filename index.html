@@ -1,370 +1,158 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>SVR Search</title>
+<meta charset="utf-8">
+<title>SVR Search</title>
 
-  <style>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; }
 
-    .loader-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,.8);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 5px solid #ccc;
-      border-top-color: #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.4);
-      z-index: 10000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-box {
-      background: #fff;
-      padding: 20px 25px;
-      border-radius: 6px;
-      min-width: 260px;
-      text-align: center;
-    }
-    
-    .modal-actions {
-      margin-top: 15px;
-    }
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
 
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
 
-    
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-    }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 15px;
+}
 
-    input, button {
-      padding: 8px;
-      margin: 5px;
-    }
+th, td { border: 1px solid #ccc; padding: 6px; font-size: 12px; }
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 15px;
-    }
+thead th {
+  position: sticky;
+  top: 0;
+  background: #f3f3f3;
+}
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 6px;
-    }
+/* Loader & modal same as home */
+.loader-overlay, .modal-overlay { position: fixed; inset:0; display:none; align-items:center; justify-content:center; }
+.loader-overlay { background:rgba(255,255,255,.8); z-index:9999; }
+.modal-overlay { background:rgba(0,0,0,.4); z-index:10000; }
 
-    tr:hover {
-      background: #f0f0f0;
-    }
+.spinner {
+  width:48px;height:48px;border:5px solid #ccc;border-top-color:#333;
+  border-radius:50%;animation:spin 1s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
 
-    thead th {
-      position: sticky;
-      top: 0;
-      background: #f9f9f9;
-      z-index: 2;
-    }
-
-    td:nth-child(10),
-    td:nth-child(14),
-    td:nth-child(15),
-    td:nth-child(16) {
-      text-align: right;
-    }
-
-    #loader {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,0.85);
-      z-index: 9999;
-      font-size: 18px;
-      font-weight: bold;
-      align-items: center;
-      justify-content: center;
-    }
-
-
-
-    
-  </style>
+.modal-box { background:#fff;padding:20px;border-radius:6px;min-width:260px;text-align:center; }
+</style>
 </head>
 
 <body>
 
-
-<div id="loader" class="loader-overlay">
-  <div class="spinner"></div>
-</div>
+<div id="loader" class="loader-overlay"><div class="spinner"></div></div>
 
 <div id="modal" class="modal-overlay">
   <div class="modal-box">
-    <div id="modal-text"></div>
-    <div class="modal-actions">
-      <button onclick="closeModal()">OK</button>
-    </div>
+    <div id="modal-text"></div><br>
+    <button onclick="confirmYes()">Yes</button>
+    <button onclick="closeModal()">No</button>
   </div>
 </div>
 
+<div class="top-bar">
+  <button onclick="goBack()">← Back</button>
+  <strong id="listTitle"></strong>
+  <button onclick="closeList()">Close List</button>
+</div>
 
-  
-<div id="loader">Loading… please wait</div>
-
-<h3 id="listTitle"></h3>
-
-<label>From Date</label>
-<input type="date" id="from">
-
-<label>To Date</label>
-<input type="date" id="to"><br>
-
-<label>Machine Number</label>
-<input type="text" id="machine">
-
-<button onclick="search()">Search</button>
-<button onclick="closeCurrentList()">Close the List</button>
+<div class="search-row">
+  <label>From</label><input type="date" id="from">
+  <label>To</label><input type="date" id="to">
+  <label>Machine</label><input type="text" id="machine">
+  <button onclick="search()">Search</button>
+</div>
 
 <table id="table">
-  <thead>
-    <tr>
-      <th>Select</th>
-      <th>Date</th>
-      <th>Location</th>
-      <th>Engineer</th>
-      <th>WS/OS</th>
-      <th>Call Type</th>
-      <th>Complaint</th>
-      <th>Customer</th>
-      <th>Machine No</th>
-      <th>HMR</th>
-      <th>Status</th>
-      <th>Site Location</th>
-      <th>Call ID</th>
-      <th>Labour</th>
-      <th>Distance</th>
-      <th>TA+DA</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
+<thead>
+<tr>
+<th>Select</th><th>Date</th><th>Location</th><th>Engineer</th>
+<th>WS/OS</th><th>Call Type</th><th>Complaint</th><th>Customer</th>
+<th>Machine</th><th>HMR</th><th>Status</th><th>Site</th>
+<th>Call ID</th><th>Labour</th><th>Distance</th><th>TA+DA</th>
+</tr>
+</thead>
+<tbody></tbody>
 </table>
 
 <script>
-/* ================= CONFIG ================= */
-
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+"https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
-/* ================= LIST ID HANDLING ================= */
+const params=new URLSearchParams(location.search);
+let LIST_ID=params.get("listId")||sessionStorage.getItem("ACTIVE_LIST_ID");
+if(!LIST_ID) location.href="home.html";
 
-const params = new URLSearchParams(window.location.search);
-let LIST_ID = params.get("listId") || sessionStorage.getItem("ACTIVE_LIST_ID");
+sessionStorage.setItem("ACTIVE_LIST_ID",LIST_ID);
+document.getElementById("listTitle").innerText="Working on List : "+LIST_ID;
 
-if (!LIST_ID) {
-  window.location.href = "home.html";
-}
+from.value="2025-12-01";
+to.value=new Date().toISOString().split("T")[0];
 
-sessionStorage.setItem("ACTIVE_LIST_ID", LIST_ID);
-document.getElementById("listTitle").textContent =
-  "Working on List : " + LIST_ID;
-
-/* ================= INIT ================= */
-
-document.getElementById("from").value = "2025-12-01";
-document.getElementById("to").value =
-  new Date().toISOString().split("T")[0];
-
-function showLoader(show) {
-  document.getElementById("loader").style.display =
-    show ? "flex" : "none";
-}
-
-/* ================= SEARCH ================= */
-
-function search() {
-  const machine = document.getElementById("machine").value.trim();
-  const from = document.getElementById("from").value;
-  const to = document.getElementById("to").value;
-
-  if (!machine) {
-    alert("Enter machine number");
-    return;
-  }
+function search(){
+  const m=machine.value.trim();
+  if(!m) return showModal("Please enter Machine Number");
 
   showLoader(true);
 
-  const cb = "search_cb_" + Date.now();
-  let script;
+  const cb="s_"+Date.now();let s;
+  window[cb]=d=>{render(d.rows||[]);showLoader(false);cleanup();};
+  function cleanup(){delete window[cb];s.remove();}
 
-  window[cb] = function (data) {
-    render(data.rows || []);
-    cleanup();
-  };
-
-  function cleanup() {
-    showLoader(false);
-    delete window[cb];
-    if (script) script.remove();
-  }
-
-  script = document.createElement("script");
-  script.src =
-    `${API_URL}?action=search` +
-    `&machine=${encodeURIComponent(machine)}` +
-    `&from=${encodeURIComponent(from)}` +
-    `&to=${encodeURIComponent(to)}` +
-    `&callback=${cb}`;
-
-  document.body.appendChild(script);
+  s=document.createElement("script");
+  s.src=`${API_URL}?action=search&machine=${m}&from=${from.value}&to=${to.value}&callback=${cb}`;
+  document.body.appendChild(s);
 }
 
-/* ================= RENDER ================= */
+function render(rows){
+  const tb=document.querySelector("#table tbody");
+  tb.innerHTML="";
+  if(!rows.length) return tb.innerHTML="<tr><td colspan='16'>No records</td></tr>";
 
-function formatDate(v) {
-  const d = new Date(v);
-  return isNaN(d) ? "" : d.toLocaleDateString("en-GB");
-}
-
-function render(rows) {
-  const tbody = document.querySelector("#table tbody");
-  tbody.innerHTML = "";
-
-  if (!rows.length) {
-    tbody.innerHTML = "<tr><td colspan='16'>No records found</td></tr>";
-    return;
-  }
-
-  rows.forEach(row => {
-    const tr = document.createElement("tr");
-
-    const cb = document.createElement("input");
-    cb.type = "checkbox";
-    cb.onchange = () => saveRow(row, cb);
-
-    tr.appendChild(td(cb));
-    tr.appendChild(td(formatDate(row[26])));
-    tr.appendChild(td(row[0]));
-    tr.appendChild(td(row[1]));
-    tr.appendChild(td(row[2]));
-    tr.appendChild(td(row[3]));
-    tr.appendChild(td(row[5]));
-    tr.appendChild(td(row[6]));
-    tr.appendChild(td(row[8]));
-    tr.appendChild(td(row[9]));
-    tr.appendChild(td(row[10]));
-    tr.appendChild(td(row[14]));
-    tr.appendChild(td(row[19]));
-    tr.appendChild(td(row[20]));
-    tr.appendChild(td(row[21]));
-    tr.appendChild(td(row[25]));
-
-    tbody.appendChild(tr);
+  rows.forEach(r=>{
+    tb.innerHTML+=`
+<tr>
+<td><input type="checkbox" onchange="saveRow(this,${encodeURIComponent(JSON.stringify(r))})"></td>
+<td>${fmt(r[26])}</td><td>${r[0]}</td><td>${r[1]}</td>
+<td>${r[2]}</td><td>${r[3]}</td><td>${r[5]}</td><td>${r[6]}</td>
+<td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td><td>${r[14]}</td>
+<td>${r[19]}</td><td>${r[20]}</td><td>${r[21]}</td><td>${r[25]}</td>
+</tr>`;
   });
 }
 
-function td(content) {
-  const td = document.createElement("td");
-  if (content instanceof HTMLElement) td.appendChild(content);
-  else td.textContent = content ?? "";
-  return td;
+function saveRow(cb,row){
+  if(!cb.checked) return;
+  const svr=prompt("Enter SVR Number");
+  if(!svr){cb.checked=false;return;}
+
+  const s=document.createElement("script");
+  s.src=`${API_URL}?action=saveRow&listId=${LIST_ID}&svrNo=${svr}&row=${row}&callback=x`;
+  document.body.appendChild(s);
 }
 
-/* ================= SAVE ROW ================= */
+let confirmAction=null;
+function goBack(){confirmAction=()=>location.href="home.html";showModal("Close list and go home?");}
+function closeList(){confirmAction=()=>{sessionStorage.removeItem("ACTIVE_LIST_ID");location.href="home.html";};showModal("Close this list?");}
+function confirmYes(){closeModal();if(confirmAction)confirmAction();}
 
-function saveRow(row, checkbox) {
-  if (!checkbox.checked) return;
-
-  const svrNo = prompt("ENTER SVR NUMBER");
-  if (!svrNo) {
-    checkbox.checked = false;
-    return;
-  }
-
-  const cb = "save_cb_" + Date.now();
-  let script;
-
-  window[cb] = function () {
-    alert("SVR saved");
-    delete window[cb];
-    script.remove();
-  };
-
-  script = document.createElement("script");
-  script.src =
-    `${API_URL}?action=saveRow` +
-    `&listId=${encodeURIComponent(LIST_ID)}` +
-    `&svrNo=${encodeURIComponent(svrNo)}` +
-    `&row=${encodeURIComponent(JSON.stringify(row))}` +
-    `&callback=${cb}`;
-
-  document.body.appendChild(script);
-}
-
-
-
-
-function showLoader(show) {
-  document.getElementById("loader").style.display =
-    show ? "flex" : "none";
-}
-
-function showModal(msg) {
-  document.getElementById("modal-text").innerText = msg;
-  document.getElementById("modal").style.display = "flex";
-}
-
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
-}
-
-
-/* ================= CLOSE LIST ================= */
-
-function closeCurrentList() {
-  if (!confirm("Close this list?")) return;
-
-  const cb = "close_cb_" + Date.now();
-  let script;
-
-  window[cb] = function () {
-    alert("List closed");
-    sessionStorage.removeItem("ACTIVE_LIST_ID");
-    window.location.href = "home.html";
-  };
-
-  script = document.createElement("script");
-  script.src =
-    `${API_URL}?action=closeList` +
-    `&listId=${encodeURIComponent(LIST_ID)}` +
-    `&callback=${cb}`;
-
-  document.body.appendChild(script);
-}
-
-document.getElementById("machine").addEventListener("keydown", e => {
-  if (e.key === "Enter") search();
-});
+function showLoader(s){loader.style.display=s?"flex":"none";}
+function showModal(t){modalText.innerText=t;modal.style.display="flex";}
+function closeModal(){modal.style.display="none";}
+function fmt(v){const d=new Date(v);return isNaN(d)?"":d.toLocaleDateString("en-GB");}
 </script>
 
 </body>
 </html>
-
