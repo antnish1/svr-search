@@ -393,19 +393,51 @@ function enableEdit(tr, rowData) {
 }
 
 function saveEdit(tr, rowData, site, call, lab, dist, tada) {
+  // Update row data object
   rowData[13] = site.value;
   rowData[19] = call.value;
   rowData[20] = lab.value;
   rowData[21] = dist.value;
   rowData[25] = tada.value;
 
+  const cells = tr.querySelectorAll("td");
+
+  cells[12].textContent = rowData[13]; // Site
+  cells[13].textContent = rowData[19]; // Call ID
+  cells[14].textContent = rowData[20]; // Labour
+  cells[15].textContent = rowData[21]; // Distance
+  cells[16].textContent = rowData[25]; // TA+DA
+
+  // Restore Edit button
+  const editTd = cells[1];
+  editTd.innerHTML = "";
+
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.onclick = () => enableEdit(tr, rowData);
+  editTd.appendChild(editBtn);
+
   tr.dataset.editing = "0";
-  search(); // re-render safely
 }
 
 function cancelEdit(tr, rowData) {
+  const cells = tr.querySelectorAll("td");
+
+  cells[12].textContent = rowData[13];
+  cells[13].textContent = rowData[19];
+  cells[14].textContent = rowData[20];
+  cells[15].textContent = rowData[21];
+  cells[16].textContent = rowData[25];
+
+  const editTd = cells[1];
+  editTd.innerHTML = "";
+
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.onclick = () => enableEdit(tr, rowData);
+  editTd.appendChild(editBtn);
+
   tr.dataset.editing = "0";
-  search(); // restore original values
 }
 
   
@@ -599,6 +631,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
