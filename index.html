@@ -127,6 +127,20 @@ document.getElementById("listTitle").innerText="Working on List : "+LIST_ID;
 from.value="2025-12-01";
 to.value=new Date().toISOString().split("T")[0];
 
+
+function td(content) {
+  const td = document.createElement("td");
+
+  if (content instanceof HTMLElement) {
+    td.appendChild(content);
+  } else {
+    td.textContent = content ?? "";
+  }
+
+  return td;
+}
+
+  
 function search(){
   const m=machine.value.trim();
   if(!m) return showModal("Please enter Machine Number");
@@ -256,5 +270,6 @@ function fmt(v){const d=new Date(v);return isNaN(d)?"":d.toLocaleDateString("en-
 
 </body>
 </html>
+
 
 
