@@ -78,6 +78,20 @@ thead th {
   min-width: 260px;
   text-align: center;
 }
+
+.modal-overlay {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+
+  
 </style>
 </head>
 
@@ -282,13 +296,16 @@ function openSVRModal(cb, rowJson) {
   svrInput.value = "";
   svrError.style.display = "none";
   svrModal.style.display = "flex";
+  svrModal.classList.add("show");
+
 }
 
 
   
 
 function closeSVRModal() {
-  svrModal.style.display = "none";
+  
+  svrModal.classList.remove("show");
   svrSaveBtn.disabled = false;
 
   if (pendingCheckbox && !pendingCheckbox.disabled) {
@@ -306,16 +323,30 @@ function saveSVR() {
 
   // 🔴 VALIDATION
   if (!svrNo) {
+      svrError.style.display = "block";
+      svrInput.focus();
+      return;
+    }
+  
+    svrError.style.display = "none";
+  
+    // ✅ IMMEDIATELY LOCK UI
+    // 🔴 VALIDATION
+  if (!svrNo) {
     svrError.style.display = "block";
     svrInput.focus();
     return;
   }
-
+  
   svrError.style.display = "none";
-
-  // ✅ IMMEDIATELY LOCK UI
+  
+  // ✅ FADE OUT MODAL IMMEDIATELY
+  svrModal.classList.remove("show");
+  
+  // ✅ SHOW LOADER IMMEDIATELY
   showLoader(true);
   svrSaveBtn.disabled = true;
+
 
   const cb = "save_" + Date.now();
   let s;
@@ -344,7 +375,7 @@ function saveSVR() {
     // ✅ CLEANUP
     showLoader(false);
     svrSaveBtn.disabled = false;
-    closeSVRModal();
+    
 
     delete window[cb];
     s.remove();
@@ -436,6 +467,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
