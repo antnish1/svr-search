@@ -47,6 +47,26 @@ thead th {
 @keyframes spin { to{transform:rotate(360deg)} }
 
 .modal-box { background:#fff;padding:20px;border-radius:6px;min-width:260px;text-align:center; }
+
+<!-- SVR INPUT MODAL -->
+<div id="svrModal" class="modal-overlay">
+  <div class="modal-box">
+    <div style="margin-bottom:10px;font-weight:bold">
+      Enter SVR Number
+    </div>
+
+    <input type="text" id="svrInput" style="width:100%;padding:6px">
+
+    <div style="margin-top:15px">
+      <button onclick="saveSVR()">Save</button>
+      <button onclick="closeSVRModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
+
+  
 </style>
 </head>
 
@@ -88,6 +108,12 @@ thead th {
 </table>
 
 <script>
+
+
+let pendingRow = null;
+let pendingCheckbox = null;
+
+  
 const API_URL =
 "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
@@ -124,7 +150,11 @@ function render(rows){
   rows.forEach(r=>{
     tb.innerHTML+=`
 <tr>
-<td><input type="checkbox" onchange="saveRow(this,${encodeURIComponent(JSON.stringify(r))})"></td>
+<td>
+  <input type="checkbox"
+    onchange="openSVRModal(this, ${encodeURIComponent(JSON.stringify(row))})">
+</td>
+
 <td>${fmt(r[26])}</td><td>${r[0]}</td><td>${r[1]}</td>
 <td>${r[2]}</td><td>${r[3]}</td><td>${r[5]}</td><td>${r[6]}</td>
 <td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td><td>${r[14]}</td>
@@ -133,15 +163,60 @@ function render(rows){
   });
 }
 
-function saveRow(cb,row){
-  if(!cb.checked) return;
-  const svr=prompt("Enter SVR Number");
-  if(!svr){cb.checked=false;return;}
 
-  const s=document.createElement("script");
-  s.src=`${API_URL}?action=saveRow&listId=${LIST_ID}&svrNo=${svr}&row=${row}&callback=x`;
-  document.body.appendChild(s);
+
+function openSVRModal(cb, rowJson) {
+  if (!cb.checked) return;
+
+  pendingRow = JSON.parse(decodeURIComponent(rowJson));
+  pendingCheckbox = cb;
+
+  document.getElementById("svrInput").value = "";
+  document.getElementById("svrModal").style.display = "flex";
 }
+
+function closeSVRModal() {
+  document.getElementById("svrModal").style.display = "none";
+
+  if (pendingCheckbox) {
+    pendingCheckbox.checked = false;
+  }
+
+  pendingRow = null;
+  pendingCheckbox = null;
+}
+
+function saveSVR() {
+  const svrNo = document.getElementById("svrInput").value.trim();
+  if (!svrNo) {
+    showModal("Please enter SVR Number");
+    return;
+  }
+
+  showLoader(true);
+
+  const cb = "save_cb_" + Date.now();
+  let script;
+
+  window[cb] = function () {
+    showLoader(false);
+    closeSVRModal();
+    delete window[cb];
+    script.remove();
+  };
+
+  script = document.createElement("script");
+  script.src =
+    `${API_URL}?action=saveRow` +
+    `&listId=${encodeURIComponent(LIST_ID)}` +
+    `&svrNo=${encodeURIComponent(svrNo)}` +
+    `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(script);
+}
+
+  
 
 let confirmAction=null;
 function goBack(){confirmAction=()=>location.href="home.html";showModal("Close list and go home?");}
@@ -156,3 +231,4 @@ function fmt(v){const d=new Date(v);return isNaN(d)?"":d.toLocaleDateString("en-
 
 </body>
 </html>
+
