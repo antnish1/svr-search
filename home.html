@@ -184,12 +184,7 @@ function renderLists(lists) {
 }
 
 
-function verifyList(listId) {
-  showConfirm(
-    "Verify this list? This action cannot be undone.",
-    () => verifyListConfirmed(listId)
-  );
-}
+
 
 function verifyListConfirmed(listId) {
   showLoader(true);
@@ -197,9 +192,12 @@ function verifyListConfirmed(listId) {
   const cb = "verify_" + Date.now();
   let s;
 
-  window[cb] = () => {
+  window[cb] = function () {
     showLoader(false);
-    loadLists(); // refresh home page
+
+    // Reload lists so status updates immediately
+    loadLists();
+
     delete window[cb];
     s.remove();
   };
@@ -208,11 +206,11 @@ function verifyListConfirmed(listId) {
   s.src =
     `${API_URL}?action=verifyList` +
     `&listId=${encodeURIComponent(listId)}` +
-    `&user=SUPERVISOR` +
     `&callback=${cb}`;
 
   document.body.appendChild(s);
 }
+
 
   
 
@@ -248,6 +246,15 @@ function previewList(id) {
   window.open(`${API_URL}?action=preview&listId=${id}`, "_blank");
 }
 
+
+function verifyList(listId) {
+  showConfirm(
+    "Are you sure you want to VERIFY this list?\nThis action is irreversible.",
+    () => verifyListConfirmed(listId)
+  );
+}
+
+  
 /* UI helpers */
 function showLoader(s){document.getElementById("loader").style.display=s?"flex":"none";}
 function showModal(t){document.getElementById("modal-text").innerText=t;document.getElementById("modal").style.display="flex";}
