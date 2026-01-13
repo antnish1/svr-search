@@ -303,7 +303,8 @@ function render(rows) {
 
     if (!isProcessed) {
       cb.onclick = () =>
-        openSVRModal(cb, encodeURIComponent(JSON.stringify(r)));
+        openSVRModal(cb, r);
+
     }
 
     /* ===== EDIT BUTTON ===== */
@@ -352,111 +353,49 @@ function enableEdit(tr, rowData) {
 
   const cells = tr.querySelectorAll("td");
 
-  const siteTd   = cells[12];
-  const callTd   = cells[13];
-  const labTd    = cells[14];
-  const distTd   = cells[15];
-  const tadaTd   = cells[16];
-  const editTd   = cells[1];
+  const editableMap = [
+    { cell: 12, index: 13 }, // Site
+    { cell: 13, index: 19 }, // Call ID
+    { cell: 14, index: 20 }, // Labour
+    { cell: 15, index: 21 }, // Distance
+    { cell: 16, index: 25 }  // TA+DA
+  ];
 
-  siteTd.innerHTML  = "";
-  callTd.innerHTML  = "";
-  labTd.innerHTML   = "";
-  distTd.innerHTML  = "";
-  tadaTd.innerHTML  = "";
+  editableMap.forEach(({ cell, index }) => {
+    const input = document.createElement("input");
+    input.type = "text";
+    input.value = rowData[index] ?? "";
+    input.style.width = "100%";
 
-  const siteIn  = inputCell(rowData[13]);
-  const callIn  = inputCell(rowData[19]);
-  const labIn   = inputCell(rowData[20]);
-  const distIn  = inputCell(rowData[21]);
-  const tadaIn  = inputCell(rowData[25]);
+    input.oninput = () => {
+      rowData[index] = input.value; // 🔥 live update
+    };
 
-  siteTd.appendChild(siteIn);
-  callTd.appendChild(callIn);
-  labTd.appendChild(labIn);
-  distTd.appendChild(distIn);
-  tadaTd.appendChild(tadaIn);
+    cells[cell].innerHTML = "";
+    cells[cell].appendChild(input);
+  });
 
-  editTd.innerHTML = "";
-
-  const saveBtn = document.createElement("button");
-  saveBtn.textContent = "Save";
-  saveBtn.onclick = () =>
-    saveEdit(tr, rowData, siteIn, callIn, labIn, distIn, tadaIn);
-
-  const cancelBtn = document.createElement("button");
-  cancelBtn.textContent = "Cancel";
-  cancelBtn.onclick = () => cancelEdit(tr, rowData);
-
-  editTd.appendChild(saveBtn);
-  editTd.appendChild(cancelBtn);
-}
-
-function saveEdit(tr, rowData, site, call, lab, dist, tada) {
-  // Update row data object
-  rowData[13] = site.value;
-  rowData[19] = call.value;
-  rowData[20] = lab.value;
-  rowData[21] = dist.value;
-  rowData[25] = tada.value;
-
-  const cells = tr.querySelectorAll("td");
-
-  cells[12].textContent = rowData[13]; // Site
-  cells[13].textContent = rowData[19]; // Call ID
-  cells[14].textContent = rowData[20]; // Labour
-  cells[15].textContent = rowData[21]; // Distance
-  cells[16].textContent = rowData[25]; // TA+DA
-
-  // Restore Edit button
+  // Disable edit button after enabling edit
   const editTd = cells[1];
-  editTd.innerHTML = "";
-
-  const editBtn = document.createElement("button");
-  editBtn.textContent = "Edit";
-  editBtn.onclick = () => enableEdit(tr, rowData);
-  editTd.appendChild(editBtn);
-
-  tr.dataset.editing = "0";
+  editTd.innerHTML = "Editing…";
 }
 
-function cancelEdit(tr, rowData) {
-  const cells = tr.querySelectorAll("td");
 
-  cells[12].textContent = rowData[13];
-  cells[13].textContent = rowData[19];
-  cells[14].textContent = rowData[20];
-  cells[15].textContent = rowData[21];
-  cells[16].textContent = rowData[25];
-
-  const editTd = cells[1];
-  editTd.innerHTML = "";
-
-  const editBtn = document.createElement("button");
-  editBtn.textContent = "Edit";
-  editBtn.onclick = () => enableEdit(tr, rowData);
-  editTd.appendChild(editBtn);
-
-  tr.dataset.editing = "0";
-}
 
   
   
 
-function openSVRModal(cb, rowJson) {
+function openSVRModal(cb, rowData) {
   if (!cb.checked) return;
 
-  pendingRow = JSON.parse(decodeURIComponent(rowJson));
+  pendingRow = rowData; // 🔥 SAME OBJECT that was edited
   pendingCheckbox = cb;
 
-  // 🔑 store row element for UI update
   pendingCheckbox._rowEl = cb.closest("tr");
 
   svrInput.value = "";
   svrError.style.display = "none";
-  svrModal.style.display = "flex";
   svrModal.classList.add("show");
-
 }
 
 
@@ -631,6 +570,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
