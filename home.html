@@ -171,6 +171,11 @@ function renderLists(lists) {
         <button class="action" onclick="openList('${l.listId}')">Open</button>
         <button class="action" onclick="editList('${l.listId}')">Edit</button>
         <button class="action" onclick="previewList('${l.listId}')">Preview</button>
+        ${l.status === "CLOSED"
+          ? `<button class="action" onclick="verifyList('${l.listId}')">Verify</button>`
+          : ""
+        }
+
       </td>
     `;
 
@@ -178,6 +183,38 @@ function renderLists(lists) {
   });
 }
 
+
+function verifyList(listId) {
+  showConfirm(
+    "Verify this list? This action cannot be undone.",
+    () => verifyListConfirmed(listId)
+  );
+}
+
+function verifyListConfirmed(listId) {
+  showLoader(true);
+
+  const cb = "verify_" + Date.now();
+  let s;
+
+  window[cb] = () => {
+    showLoader(false);
+    loadLists(); // refresh home page
+    delete window[cb];
+    s.remove();
+  };
+
+  s = document.createElement("script");
+  s.src =
+    `${API_URL}?action=verifyList` +
+    `&listId=${encodeURIComponent(listId)}` +
+    `&user=SUPERVISOR` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(s);
+}
+
+  
 
 function createList() {
   const location = document.getElementById("location").value;
