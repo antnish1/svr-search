@@ -398,20 +398,25 @@ function saveSVR() {
 
 
 
+
 let confirmAction = null;
+
+/* ===== CONFIRM MODAL (FIXED) ===== */
+
 function showConfirm(message, onYes) {
   modalText.innerText = message;
   confirmAction = onYes;
-  modal.style.display = "flex";
+  modal.classList.add("show");
 }
 
 function closeModal() {
-  modal.style.display = "none";
+  modal.classList.remove("show");
   confirmAction = null;
 }
 
 function confirmYes() {
-  modal.style.display = "none";
+  modal.classList.remove("show");
+
   if (confirmAction) {
     const action = confirmAction;
     confirmAction = null;
@@ -419,20 +424,21 @@ function confirmYes() {
   }
 }
 
+/* ===== TOP BAR ACTIONS ===== */
+
 function goBack() {
   showConfirm(
-    "Are you sure you want to close this list?",
+    "Close list and go back to Home?",
     () => location.href = "home.html"
   );
 }
-  
+
 function closeList() {
   showConfirm(
     "Are you sure you want to close this list?",
     closeListConfirmed
   );
-}  
-  
+}
 
 function closeListConfirmed() {
   showLoader(true);
@@ -444,6 +450,7 @@ function closeListConfirmed() {
     showLoader(false);
     sessionStorage.removeItem("ACTIVE_LIST_ID");
     location.href = "home.html";
+
     delete window[cb];
     s.remove();
   };
@@ -458,12 +465,11 @@ function closeListConfirmed() {
 }
 
 
+
+
   
 function showLoader(s) { loader.style.display = s ? "flex" : "none"; }
-function showModal(message) {
-  modalText.innerText = message;
-  modal.style.display = "flex";
-}
+
 
 
 
@@ -472,6 +478,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
