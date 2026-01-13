@@ -288,7 +288,11 @@ function render(rows) {
     const tr = document.createElement("tr");
 
     /* ===== DUPLICATE / PROCESSED CHECK ===== */
-    const dateKey = fmt(r[26]).split("/").reverse().join("-");
+    const d = new Date(r[26]);
+    const dateKey = isNaN(d)
+      ? ""
+      : d.toISOString().slice(0, 10); // yyyy-MM-dd
+
     const engineer = String(r[1]).trim();
     const machine = String(r[8]).trim();
     
@@ -307,7 +311,7 @@ function render(rows) {
         openSVRModal(cb, r);
 
     }
-
+    console.log("CHECK KEY:", key, processedKeys[key]);
     /* ===== EDIT BUTTON ===== */
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
@@ -581,6 +585,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
