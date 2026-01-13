@@ -5,6 +5,54 @@
   <title>SVR Search</title>
 
   <style>
+
+    .loader-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,.8);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .spinner {
+      width: 48px;
+      height: 48px;
+      border: 5px solid #ccc;
+      border-top-color: #333;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 10000;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .modal-box {
+      background: #fff;
+      padding: 20px 25px;
+      border-radius: 6px;
+      min-width: 260px;
+      text-align: center;
+    }
+    
+    .modal-actions {
+      margin-top: 15px;
+    }
+
+
+    
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
@@ -55,11 +103,31 @@
       align-items: center;
       justify-content: center;
     }
+
+
+
+    
   </style>
 </head>
 
 <body>
 
+
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+</div>
+
+<div id="modal" class="modal-overlay">
+  <div class="modal-box">
+    <div id="modal-text"></div>
+    <div class="modal-actions">
+      <button onclick="closeModal()">OK</button>
+    </div>
+  </div>
+</div>
+
+
+  
 <div id="loader">Loading… please wait</div>
 
 <h3 id="listTitle"></h3>
@@ -251,6 +319,24 @@ function saveRow(row, checkbox) {
   document.body.appendChild(script);
 }
 
+
+
+
+function showLoader(show) {
+  document.getElementById("loader").style.display =
+    show ? "flex" : "none";
+}
+
+function showModal(msg) {
+  document.getElementById("modal-text").innerText = msg;
+  document.getElementById("modal").style.display = "flex";
+}
+
+function closeModal() {
+  document.getElementById("modal").style.display = "none";
+}
+
+
 /* ================= CLOSE LIST ================= */
 
 function closeCurrentList() {
@@ -281,3 +367,4 @@ document.getElementById("machine").addEventListener("keydown", e => {
 
 </body>
 </html>
+
