@@ -39,15 +39,37 @@ thead th {
   background: #f3f3f3;
 }
 
-/* Loader & modal */
-.loader-overlay, 
-  .modal-overlay {
+/* Loader */
+.loader-overlay {
   position: fixed;
   inset: 0;
-  display: flex;
+  display: none;              /* ✅ JS controls loader */
   align-items: center;
   justify-content: center;
+  background: rgba(255,255,255,.8);
+  z-index: 9999;
 }
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;              /* ✅ always flex */
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.4);
+  z-index: 10000;
+
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.modal-overlay.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 
 .loader-overlay {
   background: rgba(255,255,255,.8);
@@ -473,6 +495,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
