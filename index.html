@@ -244,6 +244,29 @@ function search() {
   document.body.appendChild(s);
 }
 
+
+function editableCell(row, index, isProcessed, isNumber = false) {
+  const input = document.createElement("input");
+  input.value = row[index] ?? "";
+  input.style.width = "100%";
+  input.style.boxSizing = "border-box";
+  input.disabled = isProcessed;
+
+  if (isNumber) {
+    input.type = "number";
+    input.step = "any";
+  }
+
+  input.onchange = () => {
+    row[index] = input.value;
+  };
+
+  return input;
+}
+
+
+
+  
 function render(rows) {
   const tbody = document.querySelector("#table tbody");
   tbody.innerHTML = "";
@@ -290,11 +313,11 @@ function render(rows) {
     tr.appendChild(td(r[8]));
     tr.appendChild(td(r[9]));
     tr.appendChild(td(r[10]));
-    tr.appendChild(td(r[13]));
-    tr.appendChild(td(r[19]));
-    tr.appendChild(td(r[20]));
-    tr.appendChild(td(r[21]));
-    tr.appendChild(td(r[25]));
+    tr.appendChild(td(editableCell(r, 13, isProcessed)));
+    tr.appendChild(td(editableCell(r, 19, isProcessed)));
+    ttr.appendChild(td(editableCell(r, 20, isProcessed, true)));
+    tr.appendChild(td(editableCell(r, 21, isProcessed, true)));
+    tr.appendChild(td(editableCell(r, 21, isProcessed, true)));
 
     // 🎨 PROCESSED UI
     if (isProcessed) {
@@ -496,6 +519,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
