@@ -142,26 +142,51 @@ function search(){
   document.body.appendChild(s);
 }
 
-function render(rows){
-  const tb=document.querySelector("#table tbody");
-  tb.innerHTML="";
-  if(!rows.length) return tb.innerHTML="<tr><td colspan='16'>No records</td></tr>";
+function render(rows) {
+  const tbody = document.querySelector("#table tbody");
+  tbody.innerHTML = "";
 
-  rows.forEach(r=>{
-    tb.innerHTML+=`
-<tr>
-<td>
-  <input type="checkbox"
-    onchange="openSVRModal(this, ${encodeURIComponent(JSON.stringify(row))})">
-</td>
+  if (!rows.length) {
+    tbody.innerHTML =
+      "<tr><td colspan='16'>No records found</td></tr>";
+    return;
+  }
 
-<td>${fmt(r[26])}</td><td>${r[0]}</td><td>${r[1]}</td>
-<td>${r[2]}</td><td>${r[3]}</td><td>${r[5]}</td><td>${r[6]}</td>
-<td>${r[8]}</td><td>${r[9]}</td><td>${r[10]}</td><td>${r[14]}</td>
-<td>${r[19]}</td><td>${r[20]}</td><td>${r[21]}</td><td>${r[25]}</td>
-</tr>`;
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+
+    // Checkbox
+    const cbTd = document.createElement("td");
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+
+    // 🔴 FIX IS HERE — r, not row
+    cb.onchange = () =>
+      openSVRModal(cb, encodeURIComponent(JSON.stringify(r)));
+
+    cbTd.appendChild(cb);
+    tr.appendChild(cbTd);
+
+    tr.appendChild(td(fmt(r[26]))); // Date
+    tr.appendChild(td(r[0]));       // Location
+    tr.appendChild(td(r[1]));       // Engineer
+    tr.appendChild(td(r[2]));       // WS/OS
+    tr.appendChild(td(r[3]));       // Call Type
+    tr.appendChild(td(r[5]));       // Complaint
+    tr.appendChild(td(r[6]));       // Customer
+    tr.appendChild(td(r[8]));       // Machine
+    tr.appendChild(td(r[9]));       // HMR
+    tr.appendChild(td(r[10]));      // Status
+    tr.appendChild(td(r[14]));      // Site Location
+    tr.appendChild(td(r[19]));      // Call ID
+    tr.appendChild(td(r[20]));      // Labour
+    tr.appendChild(td(r[21]));      // Distance
+    tr.appendChild(td(r[25]));      // TA+DA
+
+    tbody.appendChild(tr);
   });
 }
+
 
 
 
@@ -231,4 +256,5 @@ function fmt(v){const d=new Date(v);return isNaN(d)?"":d.toLocaleDateString("en-
 
 </body>
 </html>
+
 
