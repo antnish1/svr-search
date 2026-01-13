@@ -248,11 +248,9 @@ function previewList(id) {
 
 
 function verifyList(listId) {
-  showConfirm(
-    "Are you sure you want to VERIFY this list?\nThis action is irreversible.",
-    () => verifyListConfirmed(listId)
-  );
+  verifyListConfirmed(listId);
 }
+
 
   
 /* UI helpers */
