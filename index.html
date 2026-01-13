@@ -142,6 +142,10 @@ thead th {
 let pendingRow = null;
 let pendingCheckbox = null;
 
+const modal = document.getElementById("modal");
+const modalText = document.getElementById("modal-text");
+
+  
 const API_URL =
 "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
@@ -276,10 +280,18 @@ function closeList() {
 function confirmYes() { closeModal(); if (confirmAction) confirmAction(); }
 
 function showLoader(s) { loader.style.display = s ? "flex" : "none"; }
-function showModal(t) { modalText.innerText = t; modal.style.display = "flex"; }
-function closeModal() { modal.style.display = "none"; }
+function showModal(message) {
+  modalText.innerText = message;
+  modal.style.display = "flex";
+}
+
+function closeModal() {
+  modal.style.display = "none";
+}
+
 function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateString("en-GB"); }
 </script>
 
 </body>
 </html>
+
