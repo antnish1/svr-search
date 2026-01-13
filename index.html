@@ -288,35 +288,23 @@ function render(rows) {
     const tr = document.createElement("tr");
 
     /* ===== DUPLICATE / PROCESSED CHECK ===== */
-    const d = new Date(r[26]);
+    const d = new Date(r[26]); // DATE column (AA)
     const dateKey = isNaN(d)
       ? ""
       : d.toISOString().slice(0, 10); // yyyy-MM-dd
 
-    const engineer = String(r[1]).trim();
-    const machine = String(r[8]).trim();
-    
-    // ✅ FINAL DUPLICATE KEY
-    const d = new Date(r[26]); // AA from CONSOLIDATION
-    const dateKey = isNaN(d)
-      ? ""
-      : d.toISOString().slice(0, 10);
-    
     const engineer = String(r[1] || "")
       .trim()
       .toUpperCase();
-    
+
     const machine = String(r[8] || "")
       .replace(/\.0$/, "")
       .trim();
-    
+
     const key = `${dateKey}|${engineer}|${machine}`;
-    
     const isProcessed = processedKeys[key] === true;
-    
+
     console.log("CHECK KEY:", key, processedKeys[key]);
-
-
 
     /* ===== SELECT CHECKBOX ===== */
     const cb = document.createElement("input");
@@ -324,11 +312,9 @@ function render(rows) {
     cb.disabled = isProcessed;
 
     if (!isProcessed) {
-      cb.onclick = () =>
-        openSVRModal(cb, r);
-
+      cb.onclick = () => openSVRModal(cb, r);
     }
-    console.log("CHECK KEY:", key, processedKeys[key]);
+
     /* ===== EDIT BUTTON ===== */
     const editBtn = document.createElement("button");
     editBtn.textContent = "Edit";
@@ -350,7 +336,7 @@ function render(rows) {
     tr.appendChild(td(r[9]));        // HMR
     tr.appendChild(td(r[10]));       // Status
 
-    // 🔓 Editable columns (read-only by default)
+    // 🔓 Editable columns (read-only until Edit clicked)
     tr.appendChild(td(textCell(r[13]))); // Site
     tr.appendChild(td(textCell(r[19]))); // Call ID
     tr.appendChild(td(textCell(r[20]))); // Labour
@@ -366,6 +352,7 @@ function render(rows) {
     tbody.appendChild(tr);
   });
 }
+
 
 
 
@@ -602,6 +589,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
