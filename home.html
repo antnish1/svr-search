@@ -1,113 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>SVR Portal – Home</title>
+<meta charset="utf-8">
+<title>SVR Portal – Home</title>
 
-  <style>
-    body { font-family: Arial; padding: 30px; }
+<style>
+body { font-family: Arial, sans-serif; padding: 30px; }
 
-    select, button {
-      padding: 8px;
-      margin: 5px;
-    }
+select, button { padding: 8px; margin: 5px; }
 
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
+table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-top: 20px;
+}
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
-      text-align: center;
-    }
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
 
-    th {
-      background: #f3f3f3;
-    }
+th { background: #f3f3f3; }
 
-    button.action {
-      padding: 5px 10px;
-      margin: 2px;
-    }
+button.action { padding: 5px 10px; }
 
+/* Loader */
+.loader-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.8);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
 
-    .loader-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(255,255,255,.8);
-      z-index: 9999;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .spinner {
-      width: 48px;
-      height: 48px;
-      border: 5px solid #ccc;
-      border-top-color: #333;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,.4);
-      z-index: 10000;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .modal-box {
-      background: #fff;
-      padding: 20px 25px;
-      border-radius: 6px;
-      min-width: 260px;
-      text-align: center;
-    }
-    
-    .modal-actions {
-      margin-top: 15px;
-    }
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #ccc;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
 
+@keyframes spin { to { transform: rotate(360deg); } }
 
-    
-  </style>
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  min-width: 260px;
+  text-align: center;
+}
+</style>
 </head>
 
 <body>
 
+<!-- Loader -->
 <div id="loader" class="loader-overlay">
   <div class="spinner"></div>
 </div>
 
-
+<!-- Modal -->
 <div id="modal" class="modal-overlay">
   <div class="modal-box">
-    <div id="modal-text"></div>
-    <div class="modal-actions">
-      <button onclick="closeModal()">OK</button>
-    </div>
+    <div id="modal-text"></div><br>
+    <button onclick="closeModal()">OK</button>
   </div>
 </div>
 
+<!-- PAGE CONTENT -->
 <div id="page" style="display:none">
-  <!-- existing home page content -->
-</div>
 
-  
 <h2>SVR Portal</h2>
-
-<!-- ================= CREATE LIST ================= -->
 
 <h3>Create New List</h3>
 
@@ -120,47 +99,50 @@
 
 <button onclick="createList()">Create List</button>
 
-<!-- ================= LIST TABLE ================= -->
-
 <h3>Existing Lists</h3>
 
 <table id="listTable">
-  <thead>
-    <tr>
-      <th>List ID</th>
-      <th>Date</th>
-      <th>Location</th>
-      <th>Status</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody></tbody>
+<thead>
+<tr>
+  <th>List ID</th>
+  <th>Date</th>
+  <th>Location</th>
+  <th>Status</th>
+  <th>Actions</th>
+</tr>
+</thead>
+<tbody></tbody>
 </table>
+
+</div>
 
 <script>
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+"https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
-/* ================= LOAD LISTS ================= */
-
+showLoader(true);
 loadLists();
 
 function loadLists() {
   const cb = "lists_cb_" + Date.now();
-  let script;
+  let s;
 
-  window[cb] = function (data) {
-    renderLists(data);
-    delete window[cb];
-    script.remove();
+  window[cb] = data => {
+    renderLists(data || []);
+    showLoader(false);
+    document.getElementById("page").style.display = "block";
+    cleanup();
   };
 
-  script = document.createElement("script");
-  script.src = `${API_URL}?action=getLists&callback=${cb}`;
-  document.body.appendChild(script);
-}
+  function cleanup() {
+    delete window[cb];
+    s.remove();
+  }
 
-/* ================= RENDER LISTS ================= */
+  s = document.createElement("script");
+  s.src = `${API_URL}?action=getLists&callback=${cb}`;
+  document.body.appendChild(s);
+}
 
 function renderLists(lists) {
   const tbody = document.querySelector("#listTable tbody");
@@ -172,87 +154,57 @@ function renderLists(lists) {
   }
 
   lists.forEach(l => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${l.listId}</td>
-      <td>${l.date}</td>
-      <td>${l.location}</td>
-      <td>${l.status}</td>
-      <td>
-        <button class="action" onclick="openList('${l.listId}')">Open</button>
-        <button class="action" onclick="editList('${l.listId}')">Edit</button>
-        <button class="action" onclick="pdfList('${l.listId}','${l.location}')">Preview</button>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
+    tbody.innerHTML += `
+      <tr>
+        <td>${l.listId}</td>
+        <td>${l.date}</td>
+        <td>${l.location}</td>
+        <td>${l.status}</td>
+        <td>
+          <button class="action" onclick="openList('${l.listId}')">Open</button>
+          <button class="action" onclick="editList('${l.listId}')">Edit</button>
+          <button class="action" onclick="previewList('${l.listId}')">Preview</button>
+        </td>
+      </tr>`;
   });
 }
 
-/* ================= ACTIONS ================= */
-
-function openList(listId) {
-  sessionStorage.setItem("ACTIVE_LIST_ID", listId);
-  window.location.href = "index.html?listId=" + encodeURIComponent(listId);
-}
-
-function editList(listId) {
-  window.location.href = "edit.html?listId=" + encodeURIComponent(listId);
-}
-
-function pdfList(listId) {
-  const url =
-    API_URL + "?action=preview&listId=" + encodeURIComponent(listId);
-
-  window.open(url, "_blank");
-}
-
-
-
-/* ================= CREATE LIST ================= */
-
 function createList() {
   const location = document.getElementById("location").value;
-   if (!location) {
-    showModal("Please select a location");
-    return;
-  }
+  if (!location) return showModal("Please select a location");
 
+  showLoader(true);
 
   const cb = "create_cb_" + Date.now();
-  let script;
+  let s;
 
-  window[cb] = function (listId) {
+  window[cb] = listId => {
     sessionStorage.setItem("ACTIVE_LIST_ID", listId);
-    window.location.href = "index.html?listId=" + encodeURIComponent(listId);
+    window.location.href = "index.html?listId=" + listId;
   };
 
-  script = document.createElement("script");
-  script.src =
-    `${API_URL}?action=createList` +
-    `&location=${encodeURIComponent(location)}` +
-    `&callback=${cb}`;
-
-  document.body.appendChild(script);
+  s = document.createElement("script");
+  s.src = `${API_URL}?action=createList&location=${location}&callback=${cb}`;
+  document.body.appendChild(s);
 }
 
-
-function showLoader(show) {
-  document.getElementById("loader").style.display =
-    show ? "flex" : "none";
+function openList(id) {
+  sessionStorage.setItem("ACTIVE_LIST_ID", id);
+  window.location.href = "index.html?listId=" + id;
 }
 
-function showModal(msg) {
-  document.getElementById("modal-text").innerText = msg;
-  document.getElementById("modal").style.display = "flex";
+function editList(id) {
+  window.location.href = "edit.html?listId=" + id;
 }
 
-function closeModal() {
-  document.getElementById("modal").style.display = "none";
+function previewList(id) {
+  window.open(`${API_URL}?action=preview&listId=${id}`, "_blank");
 }
 
-  
+/* UI helpers */
+function showLoader(s){document.getElementById("loader").style.display=s?"flex":"none";}
+function showModal(t){document.getElementById("modal-text").innerText=t;document.getElementById("modal").style.display="flex";}
+function closeModal(){document.getElementById("modal").style.display="none";}
 </script>
 
 </body>
