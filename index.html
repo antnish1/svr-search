@@ -273,27 +273,6 @@ function search() {
 }
 
 
-function editableCell(row, index, isProcessed, isNumber = false) {
-  const input = document.createElement("input");
-  input.value = row[index] ?? "";
-  input.style.width = "100%";
-  input.style.boxSizing = "border-box";
-  input.disabled = isProcessed;
-
-  if (isNumber) {
-    input.type = "number";
-    input.step = "any";
-  }
-
-  input.onchange = () => {
-    row[index] = input.value;
-  };
-
-  return input;
-}
-
-
-
   
 function render(rows) {
   const tbody = document.querySelector("#table tbody");
@@ -620,6 +599,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
