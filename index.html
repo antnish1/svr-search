@@ -155,7 +155,9 @@ thead th {
 <script>
 let pendingRow = null;
 let pendingCheckbox = null;
+let processedKeys = {};
 
+  
 const modal = document.getElementById("modal");
 const modalText = document.getElementById("modal-text");
 
@@ -190,7 +192,9 @@ function search() {
   let s;
 
   window[cb] = d => {
+    processedKeys = d.processedKeys || {};
     render(d.rows || []);
+
     showLoader(false);
     delete window[cb];
     s.remove();
@@ -206,18 +210,36 @@ function render(rows) {
   tbody.innerHTML = "";
 
   if (!rows.length) {
-    tbody.innerHTML = "<tr><td colspan='16'>No records found</td></tr>";
+    tbody.innerHTML =
+      "<tr><td colspan='16'>No records found</td></tr>";
     return;
   }
 
   rows.forEach(r => {
     const tr = document.createElement("tr");
 
+    // 🔑 Build duplicate key
+    const dateKey = fmt(r[26]).split("/").reverse().join("-");
+    const engineer = String(r[1]).trim();
+    const machine = String(r[8]).trim();
+    const callId = String(r[19]).trim();
+
+    const key = `${dateKey}|${engineer}|${machine}|${callId}`;
+    const isProcessed = !!processedKeys[key];
+
+    // Checkbox
     const cb = document.createElement("input");
     cb.type = "checkbox";
-    cb.onchange = () => openSVRModal(cb, encodeURIComponent(JSON.stringify(r)));
+    cb.disabled = isProcessed;
+
+    if (!isProcessed) {
+      cb.onchange = () =>
+        openSVRModal(cb, encodeURIComponent(JSON.stringify(r)));
+    }
 
     tr.appendChild(td(cb));
+
+    // Row data
     tr.appendChild(td(fmt(r[26])));
     tr.appendChild(td(r[0]));
     tr.appendChild(td(r[1]));
@@ -234,22 +256,16 @@ function render(rows) {
     tr.appendChild(td(r[21]));
     tr.appendChild(td(r[25]));
 
+    // 🎨 PROCESSED UI
+    if (isProcessed) {
+      tr.style.backgroundColor = "#d9f7d9"; // light green
+      tr.title = "Already processed";
+    }
+
     tbody.appendChild(tr);
   });
 }
 
-function openSVRModal(cb, rowJson) {
-  if (!cb.checked) return;
-
-  pendingRow = JSON.parse(decodeURIComponent(rowJson));
-  pendingCheckbox = cb;
-
-  svrInput.value = "";
-  svrError.style.display = "none"; // ✅ reset error
-  svrModal.style.display = "flex";
-
-  setTimeout(() => svrInput.focus(), 50); // UX polish
-}
 
 
 function closeSVRModal() {
@@ -336,6 +352,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
