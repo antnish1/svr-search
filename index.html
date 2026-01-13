@@ -261,7 +261,9 @@ function search() {
   window[cb] = d => {
     processedKeys = d.processedKeys || {};
     render(d.rows || []);
-
+    if (d.listStatus === "VERIFIED") {
+      lockVerifiedListUI();
+    }
     showLoader(false);
     delete window[cb];
     s.remove();
@@ -273,6 +275,19 @@ function search() {
 }
 
 
+
+function lockVerifiedListUI() {
+  // Disable selection & editing
+  document.querySelectorAll("input, button").forEach(el => {
+    el.disabled = true;
+  });
+
+  // Optional: show message
+  showConfirm("This list is VERIFIED and locked.", () => {});
+}
+
+
+  
 function getLocalDateKey(value) {
   const d = new Date(value);
   if (isNaN(d)) return "";
@@ -633,6 +648,7 @@ function finalizeRowUI(tr, rowData) {
 
 </body>
 </html>
+
 
 
 
