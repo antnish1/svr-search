@@ -311,44 +311,42 @@ function saveSVR() {
 
   svrError.style.display = "none";
 
-  // ✅ SHOW LOADER IMMEDIATELY
+  // ✅ IMMEDIATELY LOCK UI
   showLoader(true);
+  svrSaveBtn.disabled = true;
 
   const cb = "save_" + Date.now();
   let s;
 
   window[cb] = function () {
-    showLoader(false);
-  
-    // 🔑 Build processed key (same logic as render)
+    // 🔑 Build processed key
     const dateKey = fmt(pendingRow[26]).split("/").reverse().join("-");
     const engineer = String(pendingRow[1]).trim();
     const machine = String(pendingRow[8]).trim();
     const callId = String(pendingRow[19]).trim();
-  
+
     const key = `${dateKey}|${engineer}|${machine}|${callId}`;
-  
-    // ✅ Update local processedKeys
     processedKeys[key] = true;
-  
-    // ✅ Update UI immediately
+
+    // ✅ Update UI
     if (pendingCheckbox) {
       pendingCheckbox.disabled = true;
       pendingCheckbox.checked = true;
     }
-  
+
     if (pendingCheckbox && pendingCheckbox._rowEl) {
       pendingCheckbox._rowEl.style.backgroundColor = "#d9f7d9";
       pendingCheckbox._rowEl.title = "Already processed";
     }
-  
+
+    // ✅ CLEANUP
+    showLoader(false);
+    svrSaveBtn.disabled = false;
     closeSVRModal();
-  
+
     delete window[cb];
     s.remove();
   };
-  ;
-
 
   s = document.createElement("script");
   s.src =
@@ -360,6 +358,7 @@ function saveSVR() {
 
   document.body.appendChild(s);
 }
+
 
 
 let confirmAction = null;
@@ -435,6 +434,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
