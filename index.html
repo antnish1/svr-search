@@ -450,9 +450,9 @@ function saveSVR() {
     const dateKey = fmt(pendingRow[26]).split("/").reverse().join("-");
     const engineer = String(pendingRow[1]).trim();
     const machine = String(pendingRow[8]).trim();
-    const callId = String(pendingRow[19]).trim();
+    
 
-    const key = `${dateKey}|${engineer}|${machine}|${callId}`;
+    const key = `${dateKey}|${engineer}|${machine}`;
     processedKeys[key] = true;
 
     // ✅ Update UI
@@ -581,6 +581,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
