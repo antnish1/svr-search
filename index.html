@@ -174,11 +174,25 @@ thead th {
 <table id="table">
 <thead>
 <tr>
-<th>Select</th><th>Date</th><th>Location</th><th>Engineer</th>
-<th>WS/OS</th><th>Call Type</th><th>Complaint</th><th>Customer</th>
-<th>Machine</th><th>HMR</th><th>Status</th><th>Site</th>
-<th>Call ID</th><th>Labour</th><th>Distance</th><th>TA+DA</th>
+  <th>Select</th>
+  <th>Edit</th>
+  <th>Date</th>
+  <th>Location</th>
+  <th>Engineer</th>
+  <th>WS/OS</th>
+  <th>Call Type</th>
+  <th>Complaint</th>
+  <th>Customer</th>
+  <th>Machine</th>
+  <th>HMR</th>
+  <th>Status</th>
+  <th>Site</th>
+  <th>Call ID</th>
+  <th>Labour</th>
+  <th>Distance</th>
+  <th>TA+DA</th>
 </tr>
+
 </thead>
 <tbody></tbody>
 </table>
@@ -216,7 +230,21 @@ function td(content) {
   else c.textContent = content ?? "";
   return c;
 }
+function textCell(value) {
+  const span = document.createElement("span");
+  span.textContent = value ?? "";
+  return span;
+}
 
+function inputCell(value) {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.value = value ?? "";
+  input.style.width = "90%";
+  return input;
+}
+
+  
 function search() {
   const m = machine.value.trim();
    if (!m) {
@@ -279,6 +307,9 @@ function render(rows) {
 
   rows.forEach(r => {
     const tr = document.createElement("tr");
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+    editBtn.onclick = () => enableEdit(tr, r);
 
     // 🔑 Build duplicate key
     const dateKey = fmt(r[26]).split("/").reverse().join("-");
@@ -313,11 +344,12 @@ function render(rows) {
     tr.appendChild(td(r[8]));
     tr.appendChild(td(r[9]));
     tr.appendChild(td(r[10]));
-    tr.appendChild(td(editableCell(r, 13, isProcessed)));
-    tr.appendChild(td(editableCell(r, 19, isProcessed)));
-    tr.appendChild(td(editableCell(r, 20, isProcessed, true)));
-    tr.appendChild(td(editableCell(r, 21, isProcessed, true)));
-    tr.appendChild(td(editableCell(r, 25, isProcessed, true)));
+    const siteCell     = td(textCell(r[13]));
+    const callIdCell   = td(textCell(r[19]));
+    const labourCell   = td(textCell(r[20]));
+    const distCell     = td(textCell(r[21]));
+    const tadaCell     = td(textCell(r[25]));
+;
 
     // 🎨 PROCESSED UI
     if (isProcessed) {
@@ -330,6 +362,70 @@ function render(rows) {
 }
 
 
+function enableEdit(tr, rowData) {
+  if (tr.dataset.editing === "1") return;
+  tr.dataset.editing = "1";
+
+  const cells = tr.querySelectorAll("td");
+
+  const siteTd   = cells[12];
+  const callTd   = cells[13];
+  const labTd    = cells[14];
+  const distTd   = cells[15];
+  const tadaTd   = cells[16];
+  const editTd   = cells[1];
+
+  siteTd.innerHTML  = "";
+  callTd.innerHTML  = "";
+  labTd.innerHTML   = "";
+  distTd.innerHTML  = "";
+  tadaTd.innerHTML  = "";
+
+  const siteIn  = inputCell(rowData[13]);
+  const callIn  = inputCell(rowData[19]);
+  const labIn   = inputCell(rowData[20]);
+  const distIn  = inputCell(rowData[21]);
+  const tadaIn  = inputCell(rowData[25]);
+
+  siteTd.appendChild(siteIn);
+  callTd.appendChild(callIn);
+  labTd.appendChild(labIn);
+  distTd.appendChild(distIn);
+  tadaTd.appendChild(tadaIn);
+
+  editTd.innerHTML = "";
+
+  const saveBtn = document.createElement("button");
+  saveBtn.textContent = "Save";
+  saveBtn.onclick = () =>
+    saveEdit(tr, rowData, siteIn, callIn, labIn, distIn, tadaIn);
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.onclick = () => cancelEdit(tr, rowData);
+
+  editTd.appendChild(saveBtn);
+  editTd.appendChild(cancelBtn);
+}
+
+function saveEdit(tr, rowData, site, call, lab, dist, tada) {
+  rowData[13] = site.value;
+  rowData[19] = call.value;
+  rowData[20] = lab.value;
+  rowData[21] = dist.value;
+  rowData[25] = tada.value;
+
+  tr.dataset.editing = "0";
+  search(); // re-render safely
+}
+
+function cancelEdit(tr, rowData) {
+  tr.dataset.editing = "0";
+  search(); // restore original values
+}
+
+  
+  
 
 function openSVRModal(cb, rowJson) {
   if (!cb.checked) return;
@@ -519,6 +615,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
