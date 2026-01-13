@@ -51,10 +51,11 @@ thead th {
 }
 
 /* Modal */
+
 .modal-overlay {
   position: fixed;
   inset: 0;
-  display: flex;              /* ✅ always flex */
+  display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(0,0,0,.4);
@@ -71,15 +72,14 @@ thead th {
 }
 
 
+
+
 .loader-overlay {
   background: rgba(255,255,255,.8);
   z-index: 9999;
 }
 
-.modal-overlay {
-  background: rgba(0,0,0,.4);
-  z-index: 10000;
-}
+
 
 .spinner {
   width: 48px;
@@ -102,16 +102,9 @@ thead th {
   text-align: center;
 }
 
-.modal-overlay {
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.2s ease;
-}
 
-.modal-overlay.show {
-  opacity: 1;
-  pointer-events: auto;
-}
+
+
 
 
   
@@ -226,7 +219,11 @@ function td(content) {
 
 function search() {
   const m = machine.value.trim();
-  if (!m) return showModal("Please enter Machine Number");
+   if (!m) {
+    showConfirm("Please enter Machine Number", () => {});
+    return;
+  }
+
 
   showLoader(true);
 
@@ -358,12 +355,7 @@ function saveSVR() {
     svrError.style.display = "none";
   
     // ✅ IMMEDIATELY LOCK UI
-    // 🔴 VALIDATION
-  if (!svrNo) {
-    svrError.style.display = "block";
-    svrInput.focus();
-    return;
-  }
+
   
   svrError.style.display = "none";
   
@@ -491,10 +483,20 @@ function showLoader(s) { loader.style.display = s ? "flex" : "none"; }
 
 
 function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateString("en-GB"); }
+
+// ✅ Ensure clean UI on load
+window.addEventListener("load", () => {
+  showLoader(false);
+  modal.classList.remove("show");
+  svrModal.classList.remove("show");
+});
+
+  
 </script>
 
 </body>
 </html>
+
 
 
 
