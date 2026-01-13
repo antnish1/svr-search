@@ -291,10 +291,11 @@ function render(rows) {
     const dateKey = fmt(r[26]).split("/").reverse().join("-");
     const engineer = String(r[1]).trim();
     const machine = String(r[8]).trim();
-    const callId = String(r[19]).trim();
-
-    const key = `${dateKey}|${engineer}|${machine}|${callId}`;
+    
+    // ✅ FINAL DUPLICATE KEY
+    const key = `${dateKey}|${engineer}|${machine}`;
     const isProcessed = !!processedKeys[key];
+
 
     /* ===== SELECT CHECKBOX ===== */
     const cb = document.createElement("input");
@@ -580,6 +581,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
