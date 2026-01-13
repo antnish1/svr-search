@@ -245,6 +245,8 @@ const svrModal = document.getElementById("svrModal");
 const svrInput = document.getElementById("svrInput");
 const svrError = document.getElementById("svrError");
 
+let pendingInvoice = "";
+let pendingIsService = false;
 
 let pendingInvoiceRow = null;
 let pendingInvoiceCheckbox = null;
@@ -272,22 +274,32 @@ function closeInvModal() {
 
 
 function saveInvoice() {
-  const inv = invInput.value.trim();
+  const inv = document.getElementById("invoiceInput").value.trim();
 
   if (!inv) {
-    invError.style.display = "block";
+    alert("Invoice number is required");
     return;
   }
 
-  invError.style.display = "none";
-  invModal.classList.remove("show");
+  pendingInvoice = inv;
 
-  // Attach invoice to row
-  pendingInvoiceRow._invoiceNo = inv;
+  closeInvoiceModal();
 
-  // Continue normal SVR flow
-  openSVRModal(pendingInvoiceCheckbox, pendingInvoiceRow);
+  // 🔥 RESUME SVR FLOW
+  openSVRModal(pendingCheckbox, pendingRow);
 }
+
+
+function invoiceNotAvailable() {
+  pendingInvoice = "INV_NOT_AVAILABLE";
+
+  closeInvoiceModal();
+
+  // 🔥 RESUME SVR FLOW
+  openSVRModal(pendingCheckbox, pendingRow);
+}
+
+  
 
 function markInvNA() {
   pendingInvoiceRow._invoiceNo = "INV_NOT_AVAILABLE";
@@ -475,6 +487,26 @@ function render(rows) {
   });
 }
 
+function handleRowSelection(cb, rowData) {
+  if (!cb.checked) return;
+
+  const status = String(rowData[10] || "").trim().toUpperCase();
+
+  pendingCheckbox = cb;
+  pendingRow = rowData;
+  pendingInvoice = "";
+  pendingIsService = false;
+
+  // 🚨 SERVICE CALL FLOW
+  if (status === "SERVICE") {
+    pendingIsService = true;
+    openInvoiceModal();   // ⬅️ show invoice popup
+    return;               // ⛔ STOP here (SVR later)
+  }
+
+  // ✅ NORMAL FLOW
+  openSVRModal(cb, rowData);
+}
 
 
 
@@ -626,9 +658,10 @@ function saveSVR() {
     `${API_URL}?action=saveRow` +
     `&listId=${encodeURIComponent(LIST_ID)}` +
     `&svrNo=${encodeURIComponent(svrNo)}` +
-    `&invoiceNo=${encodeURIComponent(pendingRow._invoiceNo || "")}
-    &row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
+    `&invoiceNo=${encodeURIComponent(pendingInvoice || "")}` +
+    `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
     `&callback=${cb}`;
+  
 
   document.body.appendChild(s);
 }
@@ -748,6 +781,7 @@ function finalizeRowUI(tr, rowData) {
 
 </body>
 </html>
+
 
 
 
