@@ -273,6 +273,18 @@ function search() {
 }
 
 
+function getLocalDateKey(value) {
+  const d = new Date(value);
+  if (isNaN(d)) return "";
+
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+
+  return `${y}-${m}-${day}`;
+}
+
+  
   
 function render(rows) {
   const tbody = document.querySelector("#table tbody");
@@ -288,11 +300,7 @@ function render(rows) {
     const tr = document.createElement("tr");
 
     /* ===== DUPLICATE / PROCESSED CHECK ===== */
-    const d = new Date(r[26]); // DATE column (AA)
-    const dateKey = isNaN(d)
-      ? ""
-      : d.toISOString().slice(0, 10); // yyyy-MM-dd
-
+    const dateKey = getLocalDateKey(r[26]);
     const engineer = String(r[1] || "")
       .trim()
       .toUpperCase();
@@ -589,6 +597,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
