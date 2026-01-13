@@ -301,17 +301,14 @@ function render(rows) {
 
   if (!rows.length) {
     tbody.innerHTML =
-      "<tr><td colspan='16'>No records found</td></tr>";
+      "<tr><td colspan='17'>No records found</td></tr>";
     return;
   }
 
   rows.forEach(r => {
     const tr = document.createElement("tr");
-    const editBtn = document.createElement("button");
-    editBtn.textContent = "Edit";
-    editBtn.onclick = () => enableEdit(tr, r);
 
-    // 🔑 Build duplicate key
+    /* ===== DUPLICATE / PROCESSED CHECK ===== */
     const dateKey = fmt(r[26]).split("/").reverse().join("-");
     const engineer = String(r[1]).trim();
     const machine = String(r[8]).trim();
@@ -320,7 +317,7 @@ function render(rows) {
     const key = `${dateKey}|${engineer}|${machine}|${callId}`;
     const isProcessed = !!processedKeys[key];
 
-    // Checkbox
+    /* ===== SELECT CHECKBOX ===== */
     const cb = document.createElement("input");
     cb.type = "checkbox";
     cb.disabled = isProcessed;
@@ -328,38 +325,46 @@ function render(rows) {
     if (!isProcessed) {
       cb.onclick = () =>
         openSVRModal(cb, encodeURIComponent(JSON.stringify(r)));
-
     }
 
-    tr.appendChild(td(cb));
+    /* ===== EDIT BUTTON ===== */
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "Edit";
+    editBtn.disabled = isProcessed;
+    editBtn.onclick = () => enableEdit(tr, r);
 
-    // Row data
-    tr.appendChild(td(fmt(r[26])));
-    tr.appendChild(td(r[0]));
-    tr.appendChild(td(r[1]));
-    tr.appendChild(td(r[2]));
-    tr.appendChild(td(r[3]));
-    tr.appendChild(td(r[5]));
-    tr.appendChild(td(r[6]));
-    tr.appendChild(td(r[8]));
-    tr.appendChild(td(r[9]));
-    tr.appendChild(td(r[10]));
-    const siteCell     = td(textCell(r[13]));
-    const callIdCell   = td(textCell(r[19]));
-    const labourCell   = td(textCell(r[20]));
-    const distCell     = td(textCell(r[21]));
-    const tadaCell     = td(textCell(r[25]));
-;
+    /* ===== BUILD ROW ===== */
+    tr.appendChild(td(cb));          // Select
+    tr.appendChild(td(editBtn));     // Edit
 
-    // 🎨 PROCESSED UI
+    tr.appendChild(td(fmt(r[26])));  // Date
+    tr.appendChild(td(r[0]));        // Location
+    tr.appendChild(td(r[1]));        // Engineer
+    tr.appendChild(td(r[2]));        // WS/OS
+    tr.appendChild(td(r[3]));        // Call Type
+    tr.appendChild(td(r[5]));        // Complaint
+    tr.appendChild(td(r[6]));        // Customer
+    tr.appendChild(td(r[8]));        // Machine
+    tr.appendChild(td(r[9]));        // HMR
+    tr.appendChild(td(r[10]));       // Status
+
+    // 🔓 Editable columns (read-only by default)
+    tr.appendChild(td(textCell(r[13]))); // Site
+    tr.appendChild(td(textCell(r[19]))); // Call ID
+    tr.appendChild(td(textCell(r[20]))); // Labour
+    tr.appendChild(td(textCell(r[21]))); // Distance
+    tr.appendChild(td(textCell(r[25]))); // TA+DA
+
+    /* ===== PROCESSED UI ===== */
     if (isProcessed) {
-      tr.style.backgroundColor = "#d9f7d9"; // light green
+      tr.style.backgroundColor = "#d9f7d9";
       tr.title = "Already processed";
     }
 
     tbody.appendChild(tr);
   });
 }
+
 
 
 function enableEdit(tr, rowData) {
@@ -615,6 +620,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
