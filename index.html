@@ -337,17 +337,61 @@ function saveSVR() {
 
 
 let confirmAction = null;
-function goBack() {
-  confirmAction = () => location.href = "home.html";
-  showModal("Close list and go home?");
-}
 function closeList() {
   confirmAction = () => {
-    sessionStorage.removeItem("ACTIVE_LIST_ID");
-    location.href = "home.html";
+    showLoader(true);
+
+    const cb = "close_" + Date.now();
+    let s;
+
+    window[cb] = function () {
+      showLoader(false);
+      sessionStorage.removeItem("ACTIVE_LIST_ID");
+      delete window[cb];
+      s.remove();
+      location.href = "home.html";
+    };
+
+    s = document.createElement("script");
+    s.src =
+      `${API_URL}?action=closeList` +
+      `&listId=${encodeURIComponent(LIST_ID)}` +
+      `&callback=${cb}`;
+
+    document.body.appendChild(s);
   };
+
   showModal("Close this list?");
 }
+
+
+function goBack() {
+  confirmAction = () => {
+    showLoader(true);
+
+    const cb = "close_back_" + Date.now();
+    let s;
+
+    window[cb] = function () {
+      showLoader(false);
+      sessionStorage.removeItem("ACTIVE_LIST_ID");
+      delete window[cb];
+      s.remove();
+      location.href = "home.html";
+    };
+
+    s = document.createElement("script");
+    s.src =
+      `${API_URL}?action=closeList` +
+      `&listId=${encodeURIComponent(LIST_ID)}` +
+      `&callback=${cb}`;
+
+    document.body.appendChild(s);
+  };
+
+  showModal("Close list and go home?");
+}
+
 function confirmYes() { closeModal(); if (confirmAction) confirmAction(); }
 
 function showLoader(s) { loader.style.display = s ? "flex" : "none"; }
@@ -365,6 +409,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
