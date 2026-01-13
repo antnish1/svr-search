@@ -141,6 +141,42 @@ thead th {
       style="width:100%;padding:6px"
     >
 
+<!-- SERVICE INVOICE MODAL -->
+<div id="invModal" class="modal-overlay">
+  <div class="modal-box" style="position:relative">
+
+    <!-- Close Icon -->
+    <span onclick="closeInvModal()"
+      style="position:absolute;top:8px;right:10px;cursor:pointer;font-size:18px">
+      ✖
+    </span>
+
+    <div style="font-weight:bold;margin-bottom:10px">
+      Service Call! Enter Inv. No.
+    </div>
+
+    <input
+      type="text"
+      id="invInput"
+      placeholder="Invoice Number"
+      style="width:100%;padding:6px"
+    >
+
+    <div
+      id="invError"
+      style="color:red;font-size:12px;margin-top:6px;display:none">
+      Invoice number required
+    </div>
+
+    <div style="margin-top:15px">
+      <button onclick="saveInvoice()">Save</button>
+      <button onclick="markInvNA()">Inv. Not Available</button>
+    </div>
+
+  </div>
+</div>
+
+    
     <!-- 🔴 ERROR MESSAGE -->
     <div
       id="svrError"
@@ -209,6 +245,60 @@ const svrModal = document.getElementById("svrModal");
 const svrInput = document.getElementById("svrInput");
 const svrError = document.getElementById("svrError");
 
+
+let pendingInvoiceRow = null;
+let pendingInvoiceCheckbox = null;
+
+function openInvModal(cb, row) {
+  pendingInvoiceRow = row;
+  pendingInvoiceCheckbox = cb;
+
+  invInput.value = "";
+  invError.style.display = "none";
+
+  invModal.classList.add("show");
+}
+
+function closeInvModal() {
+  invModal.classList.remove("show");
+
+  if (pendingInvoiceCheckbox) {
+    pendingInvoiceCheckbox.checked = false;
+  }
+
+  pendingInvoiceRow = null;
+  pendingInvoiceCheckbox = null;
+}
+
+
+function saveInvoice() {
+  const inv = invInput.value.trim();
+
+  if (!inv) {
+    invError.style.display = "block";
+    return;
+  }
+
+  invError.style.display = "none";
+  invModal.classList.remove("show");
+
+  // Attach invoice to row
+  pendingInvoiceRow._invoiceNo = inv;
+
+  // Continue normal SVR flow
+  openSVRModal(pendingInvoiceCheckbox, pendingInvoiceRow);
+}
+
+function markInvNA() {
+  pendingInvoiceRow._invoiceNo = "INV_NOT_AVAILABLE";
+
+  invModal.classList.remove("show");
+
+  openSVRModal(pendingInvoiceCheckbox, pendingInvoiceRow);
+}
+
+  
+  
 
   
 const API_URL =
@@ -335,7 +425,16 @@ function render(rows) {
     cb.disabled = isProcessed;
 
     if (!isProcessed) {
-      cb.onclick = () => openSVRModal(cb, r);
+      cb.onclick = () => {
+        const status = String(r[10] || "").trim().toUpperCase(); // Status column
+      
+        if (status === "SERVICE") {
+          openInvModal(cb, r);
+        } else {
+          openSVRModal(cb, r);
+        }
+      };
+
     }
 
     /* ===== EDIT BUTTON ===== */
@@ -527,7 +626,8 @@ function saveSVR() {
     `${API_URL}?action=saveRow` +
     `&listId=${encodeURIComponent(LIST_ID)}` +
     `&svrNo=${encodeURIComponent(svrNo)}` +
-    `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
+    `&invoiceNo=${encodeURIComponent(pendingRow._invoiceNo || "")}
+    &row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
     `&callback=${cb}`;
 
   document.body.appendChild(s);
@@ -648,6 +748,7 @@ function finalizeRowUI(tr, rowData) {
 
 </body>
 </html>
+
 
 
 
