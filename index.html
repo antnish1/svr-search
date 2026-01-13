@@ -282,22 +282,22 @@ function saveInvoice() {
   }
 
   pendingInvoice = inv;
-
   closeInvoiceModal();
 
-  // 🔥 RESUME SVR FLOW
+  // 🔥 RESUME NORMAL FLOW
   openSVRModal(pendingCheckbox, pendingRow);
 }
+
 
 
 function invoiceNotAvailable() {
   pendingInvoice = "INV_NOT_AVAILABLE";
-
   closeInvoiceModal();
 
-  // 🔥 RESUME SVR FLOW
+  // 🔥 RESUME NORMAL FLOW
   openSVRModal(pendingCheckbox, pendingRow);
 }
+
 
   
 
@@ -437,8 +437,7 @@ function render(rows) {
     cb.disabled = isProcessed;
 
     if (!isProcessed) {
-      cb.onclick = () => {
-        const status = String(r[10] || "").trim().toUpperCase(); // Status column
+      cb.onclick = () => handleRowSelection(cb, r); // Status column
       
         if (status === "SERVICE") {
           openInvModal(cb, r);
@@ -490,23 +489,26 @@ function render(rows) {
 function handleRowSelection(cb, rowData) {
   if (!cb.checked) return;
 
-  const status = String(rowData[10] || "").trim().toUpperCase();
-
   pendingCheckbox = cb;
   pendingRow = rowData;
   pendingInvoice = "";
   pendingIsService = false;
 
-  // 🚨 SERVICE CALL FLOW
+  const status = String(rowData[10] || "")
+    .trim()
+    .toUpperCase();
+
+  // 🚨 SERVICE CALL
   if (status === "SERVICE") {
     pendingIsService = true;
-    openInvoiceModal();   // ⬅️ show invoice popup
-    return;               // ⛔ STOP here (SVR later)
+    openInvoiceModal();   // 👈 show invoice popup
+    return;               // ⛔ DO NOT open SVR yet
   }
 
   // ✅ NORMAL FLOW
   openSVRModal(cb, rowData);
 }
+
 
 
 
@@ -781,6 +783,7 @@ function finalizeRowUI(tr, rowData) {
 
 </body>
 </html>
+
 
 
 
