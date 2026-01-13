@@ -289,6 +289,7 @@ function openSVRModal(cb, rowJson) {
 
 function closeSVRModal() {
   svrModal.style.display = "none";
+  svrSaveBtn.disabled = false;
 
   if (pendingCheckbox && !pendingCheckbox.disabled) {
     pendingCheckbox.checked = false;
@@ -297,6 +298,7 @@ function closeSVRModal() {
   pendingRow = null;
   pendingCheckbox = null;
 }
+
 
 
 function saveSVR() {
@@ -434,6 +436,7 @@ function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateSt
 
 </body>
 </html>
+
 
 
 
