@@ -366,6 +366,7 @@ function render(rows) {
 
 function enableEdit(tr, rowData) {
   if (tr.dataset.editing === "1") return;
+  if (pendingRow) return; // ❌ block edit if SVR modal active
   tr.dataset.editing = "1";
 
   const cells = tr.querySelectorAll("td");
@@ -491,6 +492,11 @@ function saveSVR() {
       editBtn.textContent = "Locked";
     }
 
+    // ✅ FINALIZE ROW UI (remove inputs, lock editing)
+    if (pendingCheckbox && pendingCheckbox._rowEl) {
+      finalizeRowUI(pendingCheckbox._rowEl, pendingRow);
+    }
+
 
     // ✅ CLEANUP
     showLoader(false);
@@ -592,11 +598,42 @@ window.addEventListener("load", () => {
   svrModal.classList.remove("show");
 });
 
+
+function finalizeRowUI(tr, rowData) {
+  const cells = tr.querySelectorAll("td");
+
+  // Editable columns map
+  const map = [
+    { cell: 12, index: 13 }, // Site
+    { cell: 13, index: 19 }, // Call ID
+    { cell: 14, index: 20 }, // Labour
+    { cell: 15, index: 21 }, // Distance
+    { cell: 16, index: 25 }  // TA+DA
+  ];
+
+  map.forEach(({ cell, index }) => {
+    cells[cell].innerHTML = "";
+    cells[cell].textContent = rowData[index] ?? "";
+  });
+
+  // 🔒 Lock Edit column
+  const editTd = cells[1];
+  editTd.innerHTML = "Locked";
+  editTd.style.color = "#888";
+  editTd.style.fontWeight = "bold";
+
+  // Clear editing state
+  tr.dataset.editing = "0";
+}
+
+
+
   
 </script>
 
 </body>
 </html>
+
 
 
 
