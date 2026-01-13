@@ -465,6 +465,16 @@ function saveSVR() {
       pendingCheckbox._rowEl.title = "Already processed";
     }
 
+
+    // 🔒 LOCK EDITING
+    const rowEl = pendingCheckbox._rowEl;
+    const editBtn = rowEl.querySelector("td:nth-child(2) button");
+    if (editBtn) {
+      editBtn.disabled = true;
+      editBtn.textContent = "Locked";
+    }
+
+
     // ✅ CLEANUP
     showLoader(false);
     svrSaveBtn.disabled = false;
@@ -570,6 +580,7 @@ window.addEventListener("load", () => {
 
 </body>
 </html>
+
 
 
 
