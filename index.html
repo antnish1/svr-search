@@ -27,7 +27,11 @@ table {
   margin-top: 15px;
 }
 
-th, td { border: 1px solid #ccc; padding: 6px; font-size: 12px; }
+th, td {
+  border: 1px solid #ccc;
+  padding: 6px;
+  font-size: 12px;
+}
 
 thead th {
   position: sticky;
@@ -35,20 +39,65 @@ thead th {
   background: #f3f3f3;
 }
 
-/* Loader & modal same as home */
-.loader-overlay, .modal-overlay { position: fixed; inset:0; display:none; align-items:center; justify-content:center; }
-.loader-overlay { background:rgba(255,255,255,.8); z-index:9999; }
-.modal-overlay { background:rgba(0,0,0,.4); z-index:10000; }
+/* Loader & modal */
+.loader-overlay, .modal-overlay {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+
+.loader-overlay {
+  background: rgba(255,255,255,.8);
+  z-index: 9999;
+}
+
+.modal-overlay {
+  background: rgba(0,0,0,.4);
+  z-index: 10000;
+}
 
 .spinner {
-  width:48px;height:48px;border:5px solid #ccc;border-top-color:#333;
-  border-radius:50%;animation:spin 1s linear infinite;
+  width: 48px;
+  height: 48px;
+  border: 5px solid #ccc;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
 }
-@keyframes spin { to{transform:rotate(360deg)} }
 
-.modal-box { background:#fff;padding:20px;border-radius:6px;min-width:260px;text-align:center; }
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 
-<!-- SVR INPUT MODAL -->
+.modal-box {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+  min-width: 260px;
+  text-align: center;
+}
+</style>
+</head>
+
+<body>
+
+<!-- Loader -->
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+</div>
+
+<!-- Confirm / Alert Modal -->
+<div id="modal" class="modal-overlay">
+  <div class="modal-box">
+    <div id="modal-text"></div><br>
+    <button onclick="confirmYes()">Yes</button>
+    <button onclick="closeModal()">No</button>
+  </div>
+</div>
+
+<!-- SVR INPUT MODAL (✅ CORRECT PLACE) -->
 <div id="svrModal" class="modal-overlay">
   <div class="modal-box">
     <div style="margin-bottom:10px;font-weight:bold">
@@ -61,24 +110,6 @@ thead th {
       <button onclick="saveSVR()">Save</button>
       <button onclick="closeSVRModal()">Cancel</button>
     </div>
-  </div>
-</div>
-
-
-
-  
-</style>
-</head>
-
-<body>
-
-<div id="loader" class="loader-overlay"><div class="spinner"></div></div>
-
-<div id="modal" class="modal-overlay">
-  <div class="modal-box">
-    <div id="modal-text"></div><br>
-    <button onclick="confirmYes()">Yes</button>
-    <button onclick="closeModal()">No</button>
   </div>
 </div>
 
@@ -108,51 +139,47 @@ thead th {
 </table>
 
 <script>
-
-
 let pendingRow = null;
 let pendingCheckbox = null;
 
-  
 const API_URL =
 "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
-const params=new URLSearchParams(location.search);
-let LIST_ID=params.get("listId")||sessionStorage.getItem("ACTIVE_LIST_ID");
-if(!LIST_ID) location.href="home.html";
+const params = new URLSearchParams(location.search);
+let LIST_ID = params.get("listId") || sessionStorage.getItem("ACTIVE_LIST_ID");
+if (!LIST_ID) location.href = "home.html";
 
-sessionStorage.setItem("ACTIVE_LIST_ID",LIST_ID);
-document.getElementById("listTitle").innerText="Working on List : "+LIST_ID;
+sessionStorage.setItem("ACTIVE_LIST_ID", LIST_ID);
+listTitle.innerText = "Working on List : " + LIST_ID;
 
-from.value="2025-12-01";
-to.value=new Date().toISOString().split("T")[0];
-
+from.value = "2025-12-01";
+to.value = new Date().toISOString().split("T")[0];
 
 function td(content) {
-  const td = document.createElement("td");
-
-  if (content instanceof HTMLElement) {
-    td.appendChild(content);
-  } else {
-    td.textContent = content ?? "";
-  }
-
-  return td;
+  const c = document.createElement("td");
+  if (content instanceof HTMLElement) c.appendChild(content);
+  else c.textContent = content ?? "";
+  return c;
 }
 
-  
-function search(){
-  const m=machine.value.trim();
-  if(!m) return showModal("Please enter Machine Number");
+function search() {
+  const m = machine.value.trim();
+  if (!m) return showModal("Please enter Machine Number");
 
   showLoader(true);
 
-  const cb="s_"+Date.now();let s;
-  window[cb]=d=>{render(d.rows||[]);showLoader(false);cleanup();};
-  function cleanup(){delete window[cb];s.remove();}
+  const cb = "s_" + Date.now();
+  let s;
 
-  s=document.createElement("script");
-  s.src=`${API_URL}?action=search&machine=${m}&from=${from.value}&to=${to.value}&callback=${cb}`;
+  window[cb] = d => {
+    render(d.rows || []);
+    showLoader(false);
+    delete window[cb];
+    s.remove();
+  };
+
+  s = document.createElement("script");
+  s.src = `${API_URL}?action=search&machine=${m}&from=${from.value}&to=${to.value}&callback=${cb}`;
   document.body.appendChild(s);
 }
 
@@ -161,115 +188,98 @@ function render(rows) {
   tbody.innerHTML = "";
 
   if (!rows.length) {
-    tbody.innerHTML =
-      "<tr><td colspan='16'>No records found</td></tr>";
+    tbody.innerHTML = "<tr><td colspan='16'>No records found</td></tr>";
     return;
   }
 
   rows.forEach(r => {
     const tr = document.createElement("tr");
 
-    // Checkbox
-    const cbTd = document.createElement("td");
     const cb = document.createElement("input");
     cb.type = "checkbox";
+    cb.onchange = () => openSVRModal(cb, encodeURIComponent(JSON.stringify(r)));
 
-    // 🔴 FIX IS HERE — r, not row
-    cb.onchange = () =>
-      openSVRModal(cb, encodeURIComponent(JSON.stringify(r)));
-
-    cbTd.appendChild(cb);
-    tr.appendChild(cbTd);
-
-    tr.appendChild(td(fmt(r[26]))); // Date
-    tr.appendChild(td(r[0]));       // Location
-    tr.appendChild(td(r[1]));       // Engineer
-    tr.appendChild(td(r[2]));       // WS/OS
-    tr.appendChild(td(r[3]));       // Call Type
-    tr.appendChild(td(r[5]));       // Complaint
-    tr.appendChild(td(r[6]));       // Customer
-    tr.appendChild(td(r[8]));       // Machine
-    tr.appendChild(td(r[9]));       // HMR
-    tr.appendChild(td(r[10]));      // Status
-    tr.appendChild(td(r[14]));      // Site Location
-    tr.appendChild(td(r[19]));      // Call ID
-    tr.appendChild(td(r[20]));      // Labour
-    tr.appendChild(td(r[21]));      // Distance
-    tr.appendChild(td(r[25]));      // TA+DA
+    tr.appendChild(td(cb));
+    tr.appendChild(td(fmt(r[26])));
+    tr.appendChild(td(r[0]));
+    tr.appendChild(td(r[1]));
+    tr.appendChild(td(r[2]));
+    tr.appendChild(td(r[3]));
+    tr.appendChild(td(r[5]));
+    tr.appendChild(td(r[6]));
+    tr.appendChild(td(r[8]));
+    tr.appendChild(td(r[9]));
+    tr.appendChild(td(r[10]));
+    tr.appendChild(td(r[14]));
+    tr.appendChild(td(r[19]));
+    tr.appendChild(td(r[20]));
+    tr.appendChild(td(r[21]));
+    tr.appendChild(td(r[25]));
 
     tbody.appendChild(tr);
   });
 }
 
-
-
-
 function openSVRModal(cb, rowJson) {
   if (!cb.checked) return;
-
   pendingRow = JSON.parse(decodeURIComponent(rowJson));
   pendingCheckbox = cb;
-
-  document.getElementById("svrInput").value = "";
-  document.getElementById("svrModal").style.display = "flex";
+  svrInput.value = "";
+  svrModal.style.display = "flex";
 }
 
 function closeSVRModal() {
-  document.getElementById("svrModal").style.display = "none";
-
-  if (pendingCheckbox) {
-    pendingCheckbox.checked = false;
-  }
-
+  svrModal.style.display = "none";
+  if (pendingCheckbox) pendingCheckbox.checked = false;
   pendingRow = null;
   pendingCheckbox = null;
 }
 
 function saveSVR() {
-  const svrNo = document.getElementById("svrInput").value.trim();
-  if (!svrNo) {
-    showModal("Please enter SVR Number");
-    return;
-  }
+  const svrNo = svrInput.value.trim();
+  if (!svrNo) return showModal("Please enter SVR Number");
 
   showLoader(true);
 
-  const cb = "save_cb_" + Date.now();
-  let script;
+  const cb = "save_" + Date.now();
+  let s;
 
-  window[cb] = function () {
+  window[cb] = () => {
     showLoader(false);
     closeSVRModal();
     delete window[cb];
-    script.remove();
+    s.remove();
   };
 
-  script = document.createElement("script");
-  script.src =
-    `${API_URL}?action=saveRow` +
-    `&listId=${encodeURIComponent(LIST_ID)}` +
+  s = document.createElement("script");
+  s.src =
+    `${API_URL}?action=saveRow&listId=${LIST_ID}` +
     `&svrNo=${encodeURIComponent(svrNo)}` +
     `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
     `&callback=${cb}`;
 
-  document.body.appendChild(script);
+  document.body.appendChild(s);
 }
 
-  
+let confirmAction = null;
+function goBack() {
+  confirmAction = () => location.href = "home.html";
+  showModal("Close list and go home?");
+}
+function closeList() {
+  confirmAction = () => {
+    sessionStorage.removeItem("ACTIVE_LIST_ID");
+    location.href = "home.html";
+  };
+  showModal("Close this list?");
+}
+function confirmYes() { closeModal(); if (confirmAction) confirmAction(); }
 
-let confirmAction=null;
-function goBack(){confirmAction=()=>location.href="home.html";showModal("Close list and go home?");}
-function closeList(){confirmAction=()=>{sessionStorage.removeItem("ACTIVE_LIST_ID");location.href="home.html";};showModal("Close this list?");}
-function confirmYes(){closeModal();if(confirmAction)confirmAction();}
-
-function showLoader(s){loader.style.display=s?"flex":"none";}
-function showModal(t){modalText.innerText=t;modal.style.display="flex";}
-function closeModal(){modal.style.display="none";}
-function fmt(v){const d=new Date(v);return isNaN(d)?"":d.toLocaleDateString("en-GB");}
+function showLoader(s) { loader.style.display = s ? "flex" : "none"; }
+function showModal(t) { modalText.innerText = t; modal.style.display = "flex"; }
+function closeModal() { modal.style.display = "none"; }
+function fmt(v) { const d = new Date(v); return isNaN(d) ? "" : d.toLocaleDateString("en-GB"); }
 </script>
 
 </body>
 </html>
-
-
-
