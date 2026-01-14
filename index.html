@@ -23,54 +23,53 @@ body {
   font-size: 13px;
   background: var(--bg);
   color: var(--text);
-  padding: 24px;
+  padding: 20px;
 }
 
-/* ================= HEADER ================= */
-.header {
+/* ================= TOP BAR ================= */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   background: var(--card);
   border: 2px solid var(--border);
   border-radius: 8px;
-  padding: 16px 18px;
-  margin-bottom: 20px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
 }
 
-.header h1 {
+/* Title */
+.app-title h1 {
   margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
 }
 
-.header p {
-  margin: 4px 0 0;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-/* ================= CARD ================= */
-.card {
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 20px;
-}
-
-/* ================= FORM ================= */
-label {
+.app-title span {
   display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Create List */
+.create-list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.create-list label {
   font-size: 11px;
   font-weight: 600;
   color: var(--muted);
-  margin-bottom: 4px;
 }
 
 select {
-  padding: 8px;
+  padding: 7px 8px;
   border: 2px solid var(--border);
   border-radius: 4px;
   font-size: 13px;
-  width: 220px;
 }
 
 select:focus {
@@ -78,7 +77,7 @@ select:focus {
   border-color: var(--primary);
 }
 
-/* ================= BUTTONS ================= */
+/* Buttons */
 button {
   padding: 8px 16px;
   font-size: 13px;
@@ -97,9 +96,12 @@ button:hover {
   color: white;
 }
 
-.btn-secondary {
-  background: #e5e7eb;
-  color: #111;
+/* ================= CARD ================= */
+.card {
+  background: var(--card);
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
 }
 
 /* ================= TABLE ================= */
@@ -134,12 +136,6 @@ tbody tr:nth-child(even) {
 
 tbody tr:hover {
   background: #e0f2fe;
-}
-
-/* ================= STATUS ================= */
-.status-open {
-  color: var(--success);
-  font-weight: 700;
 }
 
 /* ================= LOADER ================= */
@@ -206,26 +202,27 @@ tbody tr:hover {
 <!-- PAGE -->
 <div id="page" style="display:none">
 
-<!-- HEADER -->
-<div class="header">
-  <h1>SVR Portal</h1>
-  <p>Service Verification & Billing Management System</p>
-</div>
+<!-- TOP BAR -->
+<div class="top-bar">
 
-<!-- CREATE LIST -->
-<div class="card">
-  <h3>Create New List</h3>
+  <!-- LEFT: TITLE -->
+  <div class="app-title">
+    <h1>SVR Portal</h1>
+    <span>Service Verification & Billing System</span>
+  </div>
 
-  <label for="location">Location</label>
-  <select id="location">
-    <option value="">-- Select --</option>
-    <option value="Branch">Branch</option>
-    <option value="Head Office">Head Office</option>
-  </select>
+  <!-- RIGHT: CREATE LIST -->
+  <div class="create-list">
+    <label for="location">Location</label>
+    <select id="location">
+      <option value="">-- Select --</option>
+      <option value="Branch">Branch</option>
+      <option value="Head Office">Head Office</option>
+    </select>
 
-  <br><br>
+    <button class="btn-primary" onclick="createList()">Create List</button>
+  </div>
 
-  <button class="btn-primary" onclick="createList()">Create List</button>
 </div>
 
 <!-- EXISTING LISTS -->
@@ -252,6 +249,7 @@ tbody tr:hover {
 
 </body>
 </html>
+
 
 <script>
 const API_URL =
