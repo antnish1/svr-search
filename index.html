@@ -368,7 +368,8 @@ tbody tr:hover {
   <!-- RIGHT: CREATE LIST -->
   <div class="create-list">
     
-    <button class="btn-primary" onclick="createList()">Create List</button>
+    <button class="btn-primary" onclick="openCreateListModal()">Create List</button>
+
   </div>
 
 </div>
@@ -636,17 +637,16 @@ function confirmCreateList() {
   );
 
   if (!selected) {
-    alert("Please select a location");
+    showModal("Please select a location");
     return;
   }
 
-  const location = selected.value;
-
   closeCreateListModal();
 
-  // 🔁 Call your existing createList logic
-  createList(location);
+  // 🔑 THIS is the only place createList() is called
+  createList(selected.value);
 }
+
 
   
   
