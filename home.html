@@ -127,10 +127,10 @@ thead th {
   </div>
 </div>
 
-<!-- SVR INPUT MODAL (✅ CORRECT PLACE) -->
-<!-- SVR INPUT MODAL -->
+<!-- ================= SVR INPUT MODAL ================= -->
 <div id="svrModal" class="modal-overlay">
   <div class="modal-box">
+
     <div style="margin-bottom:10px;font-weight:bold">
       Enter SVR Number
     </div>
@@ -141,7 +141,22 @@ thead th {
       style="width:100%;padding:6px"
     >
 
-<!-- SERVICE INVOICE MODAL -->
+    <!-- SVR ERROR -->
+    <div
+      id="svrError"
+      style="color:red;font-size:12px;margin-top:6px;display:none">
+      SVR Number is mandatory
+    </div>
+
+    <div style="margin-top:15px">
+      <button id="svrSaveBtn" onclick="saveSVR()">Save</button>
+      <button onclick="closeSVRModal()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= SERVICE INVOICE MODAL (SEPARATE) ================= -->
 <div id="invModal" class="modal-overlay">
   <div class="modal-box" style="position:relative">
 
@@ -176,36 +191,23 @@ thead th {
   </div>
 </div>
 
-    
-    <!-- 🔴 ERROR MESSAGE -->
-    <div
-      id="svrError"
-      style="color:red;font-size:12px;margin-top:6px;display:none"
-    >
-      SVR Number is mandatory
-    </div>
-
-    <div style="margin-top:15px">
-      <button id="svrSaveBtn" onclick="saveSVR()">Save</button>
-
-      <button onclick="closeSVRModal()">Cancel</button>
-    </div>
-  </div>
-</div>
-
-
+<!-- ================= PAGE TOP BAR ================= -->
 <div class="top-bar">
   <button onclick="goBack()">← Back</button>
   <strong id="listTitle"></strong>
   <button onclick="closeList()">Close List</button>
 </div>
 
+<!-- ================= SEARCH BAR ================= -->
 <div class="search-row">
   <label>From</label><input type="date" id="from">
   <label>To</label><input type="date" id="to">
   <label>Machine</label><input type="text" id="machine">
   <button onclick="search()">Search</button>
 </div>
+
+</body>
+
 
 <table id="table">
 <thead>
@@ -269,21 +271,24 @@ function openInvModal(cb, row) {
   invInput.value = "";
   invError.style.display = "none";
 
-  invModal.classList.add("show");   // 🔥 THIS WAS MISSING
+  invModal.classList.add("show"); // 👈 REQUIRED
 }
+
 
 
 function closeInvModal() {
-  const invModal = document.getElementById("invModal");
-  invModal.classList.remove("show");
+  document.getElementById("invModal").classList.remove("show");
 
-  if (pendingInvoiceCheckbox && !pendingInvoice) {
+  if (pendingInvoiceCheckbox) {
     pendingInvoiceCheckbox.checked = false;
   }
 
+  pendingCheckbox = null;
+  pendingRow = null;
   pendingInvoiceRow = null;
   pendingInvoiceCheckbox = null;
 }
+
 
 
 
@@ -495,7 +500,14 @@ function render(rows) {
 }
 
 function handleRowSelection(cb, rowData) {
+  // Do nothing if unchecked
   if (!cb.checked) return;
+
+  // 🚫 Prevent double click / re-entry
+  if (pendingCheckbox) {
+    cb.checked = false;
+    return;
+  }
 
   pendingCheckbox = cb;
   pendingRow = rowData;
@@ -506,13 +518,12 @@ function handleRowSelection(cb, rowData) {
     .trim()
     .toUpperCase();
 
-  // 🚨 SERVICE CALL
+  // 🚨 SERVICE CALL → INVOICE FIRST
   if (status === "SERVICE") {
     pendingIsService = true;
-    openInvModal(cb, rowData);   // ✅ CORRECT FUNCTION
-    return;
+    openInvModal(cb, rowData);
+    return; // ⛔ stop here
   }
-
 
   // ✅ NORMAL FLOW
   openSVRModal(cb, rowData);
