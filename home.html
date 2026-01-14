@@ -997,12 +997,16 @@ function loadListStats() {
   let s;
 
   window[cb] = function (data) {
+    const bills = Number(data?.bills || 0);
+    const totalTaDa = Number(data?.totalTaDa || 0);
+  
     document.getElementById("listStats").innerText =
-      `Bills: ${data.bills} | Total TA+DA: ₹${data.totalTaDa.toLocaleString("en-IN")}`;
-
+      `Bills: ${bills} | Total TA+DA: ₹${totalTaDa.toLocaleString("en-IN")}`;
+  
     delete window[cb];
     s.remove();
   };
+
 
   s = document.createElement("script");
   s.src =
