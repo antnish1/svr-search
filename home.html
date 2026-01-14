@@ -234,6 +234,13 @@ thead th {
 </table>
 
 <script>
+
+window.onerror = (msg, src, line, col) => {
+  alert("JS Error: " + msg + " at line " + line);
+};
+
+
+  
 let pendingRow = null;
 let pendingCheckbox = null;
 let processedKeys = {};
@@ -438,14 +445,6 @@ function render(rows) {
 
     if (!isProcessed) {
       cb.onclick = () => handleRowSelection(cb, r); // Status column
-      
-        if (status === "SERVICE") {
-          openInvModal(cb, r);
-        } else {
-          openSVRModal(cb, r);
-        }
-      };
-
     }
 
     /* ===== EDIT BUTTON ===== */
