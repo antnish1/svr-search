@@ -295,6 +295,39 @@ tbody tr:hover {
   <div class="spinner"></div>
 </div>
 
+
+<!-- CREATE LIST MODAL -->
+<div id="createListModal" class="modal-overlay">
+  <div class="modal-box">
+
+    <h3 style="margin-top:0">Create New List</h3>
+    <p style="font-size:12px;color:#4b5563">
+      Select location for this list
+    </p>
+
+    <div style="margin:15px 0">
+      <label style="display:block;margin-bottom:6px">
+        <input type="radio" name="listLocation" value="Branch">
+        Branch Office
+      </label>
+
+      <label style="display:block">
+        <input type="radio" name="listLocation" value="Head Office">
+        Head Office
+      </label>
+    </div>
+
+    <div style="margin-top:20px">
+      <button class="btn-primary" onclick="confirmCreateList()">Create</button>
+      <button class="btn-secondary" onclick="closeCreateListModal()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+
+
+
+  
 <!-- Modal -->
 <div id="modal" class="modal-overlay">
   <div class="modal-box">
@@ -334,13 +367,7 @@ tbody tr:hover {
 
   <!-- RIGHT: CREATE LIST -->
   <div class="create-list">
-    <label for="location">Location</label>
-    <select id="location">
-      <option value="">-- Select --</option>
-      <option value="Branch">Branch</option>
-      <option value="Head Office">Head Office</option>
-    </select>
-
+    
     <button class="btn-primary" onclick="createList()">Create List</button>
   </div>
 
@@ -501,9 +528,12 @@ function verifyListConfirmed(listId) {
 
   
 
-function createList() {
-  const location = document.getElementById("location").value;
-  if (!location) return showModal("Please select a location");
+function createList(location) {
+  // 🔒 SAFETY CHECK
+  if (!location) {
+    showModal("Please select a location");
+    return;
+  }
 
   showLoader(true);
 
@@ -516,7 +546,11 @@ function createList() {
   };
 
   s = document.createElement("script");
-  s.src = `${API_URL}?action=createList&location=${location}&callback=${cb}`;
+  s.src =
+    `${API_URL}?action=createList` +
+    `&location=${encodeURIComponent(location)}` +
+    `&callback=${cb}`;
+
   document.body.appendChild(s);
 }
 
@@ -582,7 +616,40 @@ function filterLists() {
   });
 }
 
+function openCreateListModal() {
+  document.getElementById("createListModal").classList.add("show");
 
+  // clear previous selection
+  document
+    .querySelectorAll("input[name='listLocation']")
+    .forEach(r => r.checked = false);
+}
+
+function closeCreateListModal() {
+  document.getElementById("createListModal").classList.remove("show");
+}
+
+
+function confirmCreateList() {
+  const selected = document.querySelector(
+    "input[name='listLocation']:checked"
+  );
+
+  if (!selected) {
+    alert("Please select a location");
+    return;
+  }
+
+  const location = selected.value;
+
+  closeCreateListModal();
+
+  // 🔁 Call your existing createList logic
+  createList(location);
+}
+
+  
+  
   
   
 </script>
