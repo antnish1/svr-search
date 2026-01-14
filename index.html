@@ -238,7 +238,7 @@ function createList() {
 
   window[cb] = listId => {
     sessionStorage.setItem("ACTIVE_LIST_ID", listId);
-    window.location.href = "index.html?listId=" + listId;
+    window.location.href = "home.html?listId=" + listId;
   };
 
   s = document.createElement("script");
@@ -248,7 +248,7 @@ function createList() {
 
 function openList(id) {
   sessionStorage.setItem("ACTIVE_LIST_ID", id);
-  window.location.href = "index.html?listId=" + id;
+  window.location.href = "home.html?listId=" + id;
 }
 
 function editList(id) {
