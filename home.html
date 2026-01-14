@@ -262,16 +262,22 @@ function openInvModal(cb, row) {
   pendingInvoiceRow = row;
   pendingInvoiceCheckbox = cb;
 
+  const invModal = document.getElementById("invModal");
+  const invInput = document.getElementById("invInput");
+  const invError = document.getElementById("invError");
+
   invInput.value = "";
   invError.style.display = "none";
 
-  invModal.classList.add("show");
+  invModal.classList.add("show");   // 🔥 THIS WAS MISSING
 }
 
+
 function closeInvModal() {
+  const invModal = document.getElementById("invModal");
   invModal.classList.remove("show");
 
-  if (pendingInvoiceCheckbox) {
+  if (pendingInvoiceCheckbox && !pendingInvoice) {
     pendingInvoiceCheckbox.checked = false;
   }
 
@@ -280,20 +286,22 @@ function closeInvModal() {
 }
 
 
+
 function saveInvoice() {
-  const inv = document.getElementById("invoiceInput").value.trim();
+  const inv = document.getElementById("invInput").value.trim();
 
   if (!inv) {
-    alert("Invoice number is required");
+    document.getElementById("invError").style.display = "block";
     return;
   }
 
   pendingInvoice = inv;
-  closeInvoiceModal();
 
-  // 🔥 RESUME NORMAL FLOW
-  openSVRModal(pendingCheckbox, pendingRow);
+  closeInvModal();
+
+  openSVRModal(pendingInvoiceCheckbox, pendingInvoiceRow);
 }
+
 
 
 
@@ -309,12 +317,13 @@ function invoiceNotAvailable() {
   
 
 function markInvNA() {
-  pendingInvoiceRow._invoiceNo = "INV_NOT_AVAILABLE";
+  pendingInvoice = "INV_NOT_AVAILABLE";
 
-  invModal.classList.remove("show");
+  closeInvModal(); // ✅ close invoice popup
 
   openSVRModal(pendingInvoiceCheckbox, pendingInvoiceRow);
 }
+
 
   
   
