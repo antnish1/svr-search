@@ -318,7 +318,7 @@ const API_URL =
 
 const params = new URLSearchParams(location.search);
 let LIST_ID = params.get("listId") || sessionStorage.getItem("ACTIVE_LIST_ID");
-if (!LIST_ID) location.href = "home.html";
+if (!LIST_ID) location.href = "index.html";
 
 sessionStorage.setItem("ACTIVE_LIST_ID", LIST_ID);
 listTitle.innerText = "Working on List : " + LIST_ID;
@@ -700,7 +700,7 @@ function confirmYes() {
 function goBack() {
   showConfirm(
     "Are you sure you want to close this list?",
-    () => location.href = "home.html"
+    () => location.href = "index.html"
   );
 }
 
@@ -720,7 +720,7 @@ function closeListConfirmed() {
   window[cb] = () => {
     showLoader(false);
     sessionStorage.removeItem("ACTIVE_LIST_ID");
-    location.href = "home.html";
+    location.href = "index.html";
 
     delete window[cb];
     s.remove();
