@@ -138,6 +138,68 @@ tbody tr:hover {
   background: #e0f2fe;
 }
 
+
+
+/* ================= ROW ACTIONS ================= */
+.row-actions {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.action-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon:hover {
+  background: #f1f5f9;
+}
+
+.action-disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+  
+
+/* ================= STATUS BADGES ================= */
+.badge {
+  display: inline-block;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  border-radius: 12px;
+  letter-spacing: 0.3px;
+}
+
+.badge-open {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.badge-closed {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.badge-verified {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+
+
+
+  
 /* ================= LOADER ================= */
 .loader-overlay {
   display: none;
@@ -292,36 +354,56 @@ function renderLists(lists) {
   lists.forEach(l => {
     const tr = document.createElement("tr");
 
+    // 🔑 for future filtering
+    tr.dataset.status = l.status;
+
     tr.innerHTML = `
       <td>${l.listId}</td>
       <td>${l.date}</td>
       <td>${l.location}</td>
-      <td>${l.status}</td>
+
+      <!-- ✅ STATUS BADGE -->
+      <td>${renderStatus(l.status)}</td>
+
       <td style="font-weight:bold">${l.svrCount}</td>
       <td style="font-weight:bold">${l.totalTaDa}</td>
-     <td>
-        <button class="action"
-          onclick="openList('${l.listId}')"
-          ${l.status === "VERIFIED" ? "disabled" : ""}>
-          Open
-        </button>
-      
-        <button class="action"
-          onclick="editList('${l.listId}')"
-          ${l.status === "VERIFIED" ? "disabled" : ""}>
-          Edit
-        </button>
-      
-        <button class="action" onclick="previewList('${l.listId}')">
-          Preview
-        </button>
-      
-        ${l.status === "CLOSED"
-          ? `<button class="action" onclick="verifyList('${l.listId}')">Verify</button>`
-          : ""
-        }
-      </td>
 
+      <!-- ✅ ACTION ICONS -->
+      <td>
+        <div class="row-actions">
+
+          <div class="action-icon"
+            title="Open List"
+            onclick="openList('${l.listId}')"
+            ${l.status === "VERIFIED" ? 'style="pointer-events:none;opacity:.4"' : ""}>
+            👁
+          </div>
+
+          <div class="action-icon"
+            title="Edit List"
+            onclick="editList('${l.listId}')"
+            ${l.status === "VERIFIED" ? 'style="pointer-events:none;opacity:.4"' : ""}>
+            ✏
+          </div>
+
+          <div class="action-icon"
+            title="Preview List"
+            onclick="previewList('${l.listId}')">
+            📄
+          </div>
+
+          ${
+            l.status === "CLOSED"
+              ? `<div class="action-icon"
+                   title="Verify List"
+                   onclick="verifyList('${l.listId}')">
+                   ✔
+                 </div>`
+              : ""
+          }
+
+        </div>
+      </td>
     `;
 
     tbody.appendChild(tr);
@@ -412,6 +494,36 @@ function verifyList(listId) {
 function showLoader(s){document.getElementById("loader").style.display=s?"flex":"none";}
 function showModal(t){document.getElementById("modal-text").innerText=t;document.getElementById("modal").style.display="flex";}
 function closeModal(){document.getElementById("modal").style.display="none";}
+
+function renderStatus(status) {
+  if (status === "VERIFIED") {
+    return `<span class="badge badge-verified">VERIFIED</span>`;
+  }
+  if (status === "CLOSED") {
+    return `<span class="badge badge-closed">CLOSED</span>`;
+  }
+  return `<span class="badge badge-open">OPEN</span>`;
+}
+
+function filterLists() {
+  const search = document.getElementById("listSearch").value.toLowerCase();
+  const status = document.getElementById("statusFilter").value;
+
+  const rows = document.querySelectorAll("#listTable tbody tr");
+
+  rows.forEach(tr => {
+    const text = tr.innerText.toLowerCase();
+    const rowStatus = tr.dataset.status;
+
+    const matchesText = text.includes(search);
+    const matchesStatus = !status || rowStatus === status;
+
+    tr.style.display = matchesText && matchesStatus ? "" : "none";
+  });
+}
+
+  
+  
 </script>
 
 </body>
