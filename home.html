@@ -954,6 +954,32 @@ function finalizeRowUI(tr, rowData) {
 }
 
 
+// ================= KEYBOARD SHORTCUTS =================
+document.addEventListener("keydown", function (e) {
+  if (e.key !== "Enter") return;
+
+  // 🚫 Do not trigger search if a modal is open
+  const invModal = document.getElementById("invModal");
+  const svrModal = document.getElementById("svrModal");
+
+  if (
+    (invModal && invModal.classList.contains("show")) ||
+    (svrModal && svrModal.classList.contains("show"))
+  ) {
+    return;
+  }
+
+  // ✅ Trigger search only if focus is inside search inputs
+  const active = document.activeElement;
+  const allowedIds = ["machine", "from", "to"];
+
+  if (allowedIds.includes(active.id)) {
+    e.preventDefault(); // prevent accidental form submit
+    search();
+  }
+});
+
+  
 
   
 </script>
