@@ -5,7 +5,11 @@
 <title>SVR Search</title>
 
 <style>
-body { font-family: Arial, sans-serif; padding: 20px; }
+/* ================= BASE ================= */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
 
 .top-bar {
   display: flex;
@@ -39,19 +43,31 @@ thead th {
   background: #f3f3f3;
 }
 
-/* Loader */
+/* ================= LOADER ================= */
 .loader-overlay {
   position: fixed;
   inset: 0;
-  display: none;              /* ✅ JS controls loader */
+  display: none;
   align-items: center;
   justify-content: center;
   background: rgba(255,255,255,.8);
   z-index: 9999;
 }
 
-/* Modal */
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 5px solid #ccc;
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
 
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================= MODALS (BASE) ================= */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -71,29 +87,6 @@ thead th {
   pointer-events: auto;
 }
 
-
-
-
-.loader-overlay {
-  background: rgba(255,255,255,.8);
-  z-index: 9999;
-}
-
-
-
-.spinner {
-  width: 48px;
-  height: 48px;
-  border: 5px solid #ccc;
-  border-top-color: #333;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to { transform: rotate(360deg); }
-}
-
 .modal-box {
   background: #fff;
   padding: 20px;
@@ -102,16 +95,73 @@ thead th {
   text-align: center;
 }
 
+/* ================= SERVICE INVOICE MODAL (DISTINCT STYLE) ================= */
 
+#invModal {
+  background: rgba(120, 0, 0, 0.45); /* dark red overlay */
+}
 
+#invModal .modal-box {
+  border: 2px solid #c0392b;
+  background: #fff6f6;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+  animation: popIn 0.25s ease-out;
+}
 
+#invModal .inv-title {
+  color: #c0392b;
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
 
+#invModal input {
+  border: 1px solid #c0392b;
+  outline: none;
+}
 
-  
+#invModal input:focus {
+  border-color: #e74c3c;
+  box-shadow: 0 0 4px rgba(231, 76, 60, 0.5);
+}
+
+#invModal button {
+  padding: 6px 14px;
+  margin: 0 4px;
+}
+
+#invModal button:first-child {
+  background: #c0392b;
+  color: #fff;
+  border: none;
+}
+
+#invModal button:last-child {
+  background: #7f8c8d;
+  color: #fff;
+  border: none;
+}
+
+#invModal span {
+  color: #c0392b;
+  font-weight: bold;
+}
+
+@keyframes popIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
 </style>
 </head>
 
 <body>
+
 
 <!-- Loader -->
 <div id="loader" class="loader-overlay">
@@ -166,9 +216,10 @@ thead th {
       ✖
     </span>
 
-    <div style="font-weight:bold;margin-bottom:10px">
-      Service Call! Enter Inv. No.
+    <div class="inv-title">
+      ⚠ Service Call – Enter Invoice Number
     </div>
+
 
     <input
       type="text"
@@ -191,6 +242,11 @@ thead th {
   </div>
 </div>
 
+
+
+
+
+  
 <!-- ================= PAGE TOP BAR ================= -->
 <div class="top-bar">
   <button onclick="goBack()">← Back</button>
