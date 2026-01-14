@@ -500,9 +500,10 @@ function handleRowSelection(cb, rowData) {
   // 🚨 SERVICE CALL
   if (status === "SERVICE") {
     pendingIsService = true;
-    openInvoiceModal();   // 👈 show invoice popup
-    return;               // ⛔ DO NOT open SVR yet
+    openInvModal(cb, rowData);   // ✅ CORRECT FUNCTION
+    return;
   }
+
 
   // ✅ NORMAL FLOW
   openSVRModal(cb, rowData);
@@ -697,7 +698,7 @@ function confirmYes() {
 
 function goBack() {
   showConfirm(
-    "Are you sure you want to close this list?",
+    "List is still open, go back?",
     () => location.href = "index.html"
   );
 }
