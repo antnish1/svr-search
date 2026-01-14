@@ -341,9 +341,7 @@ tr[title="Already processed"] {
   <button onclick="goBack()">← Back</button>
   <div>
     <strong id="listTitle"></strong>
-    <div id="listStats" style="font-size:11px;color:#374151;margin-top:2px;">
-      Bills: 0 | Total TA+DA: ₹0
-    </div>
+    
   </div>
 
   <button onclick="closeList()">Close List</button>
@@ -501,7 +499,7 @@ if (!LIST_ID) location.href = "index.html";
 
 sessionStorage.setItem("ACTIVE_LIST_ID", LIST_ID);
 listTitle.innerText = "Working on List : " + LIST_ID;
-loadListStats();
+
 
 from.value = "2025-12-01";
 to.value = new Date().toISOString().split("T")[0];
@@ -850,7 +848,7 @@ function saveSVR() {
     `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
     `&callback=${cb}`;
   
-  loadListStats();
+  
 
   document.body.appendChild(s);
 }
@@ -992,30 +990,7 @@ document.addEventListener("keydown", function (e) {
 
 
   
-function loadListStats() {
-  const cb = "stats_" + Date.now();
-  let s;
 
-  window[cb] = function (data) {
-    const bills = Number(data?.bills || 0);
-    const totalTaDa = Number(data?.totalTaDa || 0);
-  
-    document.getElementById("listStats").innerText =
-      `Bills: ${bills} | Total TA+DA: ₹${totalTaDa.toLocaleString("en-IN")}`;
-  
-    delete window[cb];
-    s.remove();
-  };
-
-
-  s = document.createElement("script");
-  s.src =
-    `${API_URL}?action=getListSummary` +
-    `&listId=${encodeURIComponent(LIST_ID)}` +
-    `&callback=${cb}`;
-
-  document.body.appendChild(s);
-}
 
   
 </script>
