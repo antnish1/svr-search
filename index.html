@@ -224,6 +224,48 @@ tbody tr:hover {
   to { transform: rotate(360deg); }
 }
 
+
+/* ================= TOP BAR SEARCH ================= */
+.top-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  justify-content: center;
+}
+
+.top-search input {
+  width: 320px;
+  padding: 8px 12px;
+  border-radius: 20px;                 /* Gmail-like */
+  border: 2px solid var(--border);
+  font-size: 13px;
+  background: #f8fafc;
+}
+
+.top-search input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--primary);
+}
+
+/* Status dropdown (bigger & readable) */
+.top-search select {
+  padding: 8px 10px;
+  min-width: 130px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  font-size: 13px;
+  background: #ffffff;
+}
+
+.top-search select:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+
+  
 /* ================= MODAL ================= */
 .modal-overlay {
   display: none;
@@ -269,8 +311,25 @@ tbody tr:hover {
 
   <!-- LEFT: TITLE -->
   <div class="app-title">
-    <h1>TA DA VERIFICATION PORTAL</h1>
-    <span>designed for Frontier JCB by Nishant</span>
+    <h1>SVR Portal</h1>
+    <span>Service Verification & Billing System</span>
+  </div>
+
+  <!-- CENTER: SEARCH + FILTER -->
+  <div class="top-search">
+    <input
+      type="text"
+      id="listSearch"
+      placeholder="Search lists by ID, location…"
+      onkeyup="filterLists()"
+    >
+
+    <select id="statusFilter" onchange="filterLists()">
+      <option value="">All Status</option>
+      <option value="OPEN">Open</option>
+      <option value="CLOSED">Closed</option>
+      <option value="VERIFIED">Verified</option>
+    </select>
   </div>
 
   <!-- RIGHT: CREATE LIST -->
@@ -287,15 +346,9 @@ tbody tr:hover {
 
 </div>
 
+
 <!-- EXISTING LISTS -->
 <div class="card">
-  
-  <div style="display:flex; gap:10px; margin-bottom:12px;">
-    <input id="listSearch" ... onkeyup="filterLists()">
-    <select id="statusFilter" onchange="filterLists()">...</select>
-  </div>
-
-  
   <h3>All Lists</h3>
 
   <table id="listTable">
@@ -528,6 +581,7 @@ function filterLists() {
     tr.style.display = matchesText && matchesStatus ? "" : "none";
   });
 }
+
 
   
   
