@@ -657,7 +657,7 @@ function render(rows) {
     tbody.appendChild(tr);
   });
 
-  updateListStats();
+  
 }
 
 function handleRowSelection(cb, rowData) {
@@ -989,27 +989,6 @@ document.addEventListener("keydown", function (e) {
     search();
   }
 });
-
-
-function updateListStats() {
-  let billCount = 0;
-  let totalTaDa = 0;
-
-  const rows = document.querySelectorAll("#table tbody tr");
-
-  rows.forEach(tr => {
-    if (tr.title === "Already processed") {
-      billCount++;
-
-      const tadaCell = tr.querySelector("td:last-child");
-      const val = parseFloat(tadaCell?.innerText || 0);
-      if (!isNaN(val)) totalTaDa += val;
-    }
-  });
-
-  document.getElementById("listStats").innerText =
-    `Bills: ${billCount} | Total TA+DA: ₹${totalTaDa.toLocaleString("en-IN")}`;
-}
 
 
   
