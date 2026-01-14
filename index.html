@@ -289,6 +289,13 @@ tbody tr:hover {
 
 <!-- EXISTING LISTS -->
 <div class="card">
+  
+  <div style="display:flex; gap:10px; margin-bottom:12px;">
+    <input id="listSearch" ... onkeyup="filterLists()">
+    <select id="statusFilter" onchange="filterLists()">...</select>
+  </div>
+
+  
   <h3>All Lists</h3>
 
   <table id="listTable">
