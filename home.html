@@ -993,20 +993,20 @@ function updateListStats() {
   let billCount = 0;
   let totalTaDa = 0;
 
-  Object.keys(processedKeys || {}).forEach(k => {
-    if (processedKeys[k] === true) {
-      billCount++;
-    }
-  });
-
-  // Sum TA+DA from processed rows
   const rows = document.querySelectorAll("#table tbody tr");
 
   rows.forEach(tr => {
+    // Processed rows are SVRs
     if (tr.title === "Already processed") {
+      billCount++;
+
+      // TA+DA column (last column in your table)
       const tadaCell = tr.querySelector("td:last-child");
-      const val = parseFloat(tadaCell?.innerText || 0);
-      if (!isNaN(val)) totalTaDa += val;
+      const value = parseFloat(tadaCell?.innerText || 0);
+
+      if (!isNaN(value)) {
+        totalTaDa += value;
+      }
     }
   });
 
