@@ -339,7 +339,13 @@ tr[title="Already processed"] {
 <!-- ================= PAGE TOP BAR ================= -->
 <div class="top-bar">
   <button onclick="goBack()">← Back</button>
-  <strong id="listTitle"></strong>
+  <div>
+    <strong id="listTitle"></strong>
+    <div id="listStats" style="font-size:11px;color:#374151;margin-top:2px;">
+      Bills: 0 | Total TA+DA: ₹0
+    </div>
+  </div>
+
   <button onclick="closeList()">Close List</button>
 </div>
 
@@ -649,6 +655,8 @@ function render(rows) {
 
     tbody.appendChild(tr);
   });
+
+  updateListStats();
 }
 
 function handleRowSelection(cb, rowData) {
@@ -840,7 +848,8 @@ function saveSVR() {
     `&invoiceNo=${encodeURIComponent(pendingInvoice || "")}` +
     `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
     `&callback=${cb}`;
-
+  
+  updateListStats();
   document.body.appendChild(s);
 }
 
@@ -978,6 +987,32 @@ document.addEventListener("keydown", function (e) {
     search();
   }
 });
+
+
+function updateListStats() {
+  let billCount = 0;
+  let totalTaDa = 0;
+
+  Object.keys(processedKeys || {}).forEach(k => {
+    if (processedKeys[k] === true) {
+      billCount++;
+    }
+  });
+
+  // Sum TA+DA from processed rows
+  const rows = document.querySelectorAll("#table tbody tr");
+
+  rows.forEach(tr => {
+    if (tr.title === "Already processed") {
+      const tadaCell = tr.querySelector("td:last-child");
+      const val = parseFloat(tadaCell?.innerText || 0);
+      if (!isNaN(val)) totalTaDa += val;
+    }
+  });
+
+  document.getElementById("listStats").innerText =
+    `Bills: ${billCount} | Total TA+DA: ₹${totalTaDa.toLocaleString("en-IN")}`;
+}
 
   
 
