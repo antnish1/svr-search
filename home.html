@@ -501,6 +501,7 @@ if (!LIST_ID) location.href = "index.html";
 
 sessionStorage.setItem("ACTIVE_LIST_ID", LIST_ID);
 listTitle.innerText = "Working on List : " + LIST_ID;
+loadListStats();
 
 from.value = "2025-12-01";
 to.value = new Date().toISOString().split("T")[0];
@@ -849,7 +850,8 @@ function saveSVR() {
     `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
     `&callback=${cb}`;
   
-  updateListStats();
+  loadListStats();
+
   document.body.appendChild(s);
 }
 
@@ -996,17 +998,12 @@ function updateListStats() {
   const rows = document.querySelectorAll("#table tbody tr");
 
   rows.forEach(tr => {
-    // Processed rows are SVRs
     if (tr.title === "Already processed") {
       billCount++;
 
-      // TA+DA column (last column in your table)
       const tadaCell = tr.querySelector("td:last-child");
-      const value = parseFloat(tadaCell?.innerText || 0);
-
-      if (!isNaN(value)) {
-        totalTaDa += value;
-      }
+      const val = parseFloat(tadaCell?.innerText || 0);
+      if (!isNaN(val)) totalTaDa += val;
     }
   });
 
@@ -1014,34 +1011,34 @@ function updateListStats() {
     `Bills: ${billCount} | Total TA+DA: ₹${totalTaDa.toLocaleString("en-IN")}`;
 }
 
+
   
+function loadListStats() {
+  const cb = "stats_" + Date.now();
+  let s;
+
+  window[cb] = function (data) {
+    document.getElementById("listStats").innerText =
+      `Bills: ${data.bills} | Total TA+DA: ₹${data.totalTaDa.toLocaleString("en-IN")}`;
+
+    delete window[cb];
+    s.remove();
+  };
+
+  s = document.createElement("script");
+  s.src =
+    `${API_URL}?action=getListSummary` +
+    `&listId=${encodeURIComponent(LIST_ID)}` +
+    `&callback=${cb}`;
+
+  document.body.appendChild(s);
+}
 
   
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
