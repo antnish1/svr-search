@@ -283,11 +283,13 @@ function closeInvModal() {
     pendingInvoiceCheckbox.checked = false;
   }
 
-  pendingCheckbox = null;
-  pendingRow = null;
+  pendingInvoice = "";
   pendingInvoiceRow = null;
   pendingInvoiceCheckbox = null;
+
+  // ⚠️ DO NOT clear pendingCheckbox here
 }
+
 
 
 
@@ -302,10 +304,15 @@ function saveInvoice() {
 
   pendingInvoice = inv;
 
-  closeInvModal();
+  // ✅ close invoice modal safely
+  document.getElementById("invModal").classList.remove("show");
+
+  // ✅ DO NOT touch pendingCheckbox here
+  // ✅ Use pendingInvoiceCheckbox instead
 
   openSVRModal(pendingInvoiceCheckbox, pendingInvoiceRow);
 }
+
 
 
 
@@ -324,7 +331,7 @@ function invoiceNotAvailable() {
 function markInvNA() {
   pendingInvoice = "INV_NOT_AVAILABLE";
 
-  closeInvModal(); // ✅ close invoice popup
+  document.getElementById("invModal").classList.remove("show");
 
   openSVRModal(pendingInvoiceCheckbox, pendingInvoiceRow);
 }
