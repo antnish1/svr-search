@@ -513,8 +513,7 @@ function handleRowSelection(cb, rowData) {
 
 function enableEdit(tr, rowData) {
   if (tr.dataset.editing === "1") return;
-  if (pendingRow) return; // ❌ block edit if SVR modal active
-  tr.dataset.editing = "1";
+   tr.dataset.editing = "1";
 
   const cells = tr.querySelectorAll("td");
 
