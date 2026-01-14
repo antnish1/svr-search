@@ -507,11 +507,16 @@ function render(rows) {
 }
 
 function handleRowSelection(cb, rowData) {
-  // Do nothing if unchecked
   if (!cb.checked) return;
 
-  // 🚫 Prevent double click / re-entry
-  if (pendingCheckbox) {
+  const invModal = document.getElementById("invModal");
+  const svrModal = document.getElementById("svrModal");
+
+  // 🚫 Block only if a modal is already open
+  if (
+    invModal.classList.contains("show") ||
+    svrModal.classList.contains("show")
+  ) {
     cb.checked = false;
     return;
   }
@@ -525,16 +530,17 @@ function handleRowSelection(cb, rowData) {
     .trim()
     .toUpperCase();
 
-  // 🚨 SERVICE CALL → INVOICE FIRST
+  // 🚨 SERVICE FLOW
   if (status === "SERVICE") {
     pendingIsService = true;
     openInvModal(cb, rowData);
-    return; // ⛔ stop here
+    return;
   }
 
   // ✅ NORMAL FLOW
   openSVRModal(cb, rowData);
 }
+
 
 
 
@@ -594,7 +600,6 @@ function openSVRModal(cb, rowData) {
   
 
 function closeSVRModal() {
-  
   svrModal.classList.remove("show");
   svrSaveBtn.disabled = false;
 
@@ -602,8 +607,12 @@ function closeSVRModal() {
     pendingCheckbox.checked = false;
   }
 
+  // ✅ 🔥 CLEAR ALL FLOW STATE
   pendingRow = null;
   pendingCheckbox = null;
+  pendingInvoice = "";
+  pendingInvoiceRow = null;
+  pendingInvoiceCheckbox = null;
 }
 
 
@@ -613,25 +622,19 @@ function saveSVR() {
 
   // 🔴 VALIDATION
   if (!svrNo) {
-      svrError.style.display = "block";
-      svrInput.focus();
-      return;
-    }
-  
-    svrError.style.display = "none";
-  
-    // ✅ IMMEDIATELY LOCK UI
+    svrError.style.display = "block";
+    svrInput.focus();
+    return;
+  }
 
-  
   svrError.style.display = "none";
-  
+
   // ✅ FADE OUT MODAL IMMEDIATELY
   svrModal.classList.remove("show");
-  
+
   // ✅ SHOW LOADER IMMEDIATELY
   showLoader(true);
   svrSaveBtn.disabled = true;
-
 
   const cb = "save_" + Date.now();
   let s;
@@ -641,7 +644,6 @@ function saveSVR() {
     const dateKey = fmt(pendingRow[26]).split("/").reverse().join("-");
     const engineer = String(pendingRow[1]).trim();
     const machine = String(pendingRow[8]).trim();
-    
 
     const key = `${dateKey}|${engineer}|${machine}`;
     processedKeys[key] = true;
@@ -657,7 +659,6 @@ function saveSVR() {
       pendingCheckbox._rowEl.title = "Already processed";
     }
 
-
     // 🔒 LOCK EDITING
     const rowEl = pendingCheckbox._rowEl;
     const editBtn = rowEl.querySelector("td:nth-child(2) button");
@@ -666,16 +667,21 @@ function saveSVR() {
       editBtn.textContent = "Locked";
     }
 
-    // ✅ FINALIZE ROW UI (remove inputs, lock editing)
+    // ✅ FINALIZE ROW UI
     if (pendingCheckbox && pendingCheckbox._rowEl) {
       finalizeRowUI(pendingCheckbox._rowEl, pendingRow);
     }
 
-
-    // ✅ CLEANUP
+    // ✅ CLEANUP UI
     showLoader(false);
     svrSaveBtn.disabled = false;
-    
+
+    // ✅ 🔥 CRITICAL STATE RESET (THIS FIXES THE ISSUE)
+    pendingRow = null;
+    pendingCheckbox = null;
+    pendingInvoice = "";
+    pendingInvoiceRow = null;
+    pendingInvoiceCheckbox = null;
 
     delete window[cb];
     s.remove();
@@ -689,10 +695,10 @@ function saveSVR() {
     `&invoiceNo=${encodeURIComponent(pendingInvoice || "")}` +
     `&row=${encodeURIComponent(JSON.stringify(pendingRow))}` +
     `&callback=${cb}`;
-  
 
   document.body.appendChild(s);
 }
+
 
 
 
