@@ -614,6 +614,20 @@ function renderLists(lists) {
               : ""
           }
 
+
+
+
+          ${
+            l.status === "VERIFIED"
+              ? `<div class="action-icon"
+                   title="Mark Passed"
+                   onclick="markPassed('${l.listId}')">
+                   ✅
+                 </div>`
+              : ""
+          }
+
+        
         </div>
       </td>
     `;
@@ -779,6 +793,22 @@ function toggleStatusFilter(e) {
   dd.classList.toggle("show");
 }
 
+
+function markPassed(listId) {
+  const pwd = prompt("Enter pass approval password");
+
+  if (pwd === null) return;
+
+  if (pwd !== "000007") {
+    showModal("❌ Incorrect password");
+    return;
+  }
+
+  // redirect to passed amount entry screen
+  window.location.href = "passed.html?listId=" + listId;
+}
+
+  
 // Close status filter when clicking outside
 document.addEventListener("click", function () {
   const dd = document.getElementById("statusFilter");
