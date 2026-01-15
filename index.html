@@ -287,19 +287,38 @@ tbody tr:hover {
   position: relative;
 }
 
+/* Flat filter icon (no circle) */
 .filter-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 2px solid var(--border);
-  background: #ffffff;
+  background: none;
+  border: none;
+  padding: 4px 6px;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 18px;
+  color: var(--muted);
 }
 
 .filter-btn:hover {
-  background: #f1f5f9;
+  color: var(--primary);
 }
+
+/* Dropdown stays same */
+.status-dropdown {
+  position: absolute;
+  top: 36px;
+  right: 0;
+  display: none;
+  min-width: 150px;
+  padding: 8px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  background: white;
+  z-index: 50;
+}
+
+.status-dropdown.show {
+  display: block;
+}
+
 
 /* Hidden dropdown */
 .status-dropdown {
@@ -423,13 +442,14 @@ tbody tr:hover {
 
   <!-- Filter Icon -->
   <div class="filter-wrapper">
-    <button
-      class="filter-btn"
-      title="Filter by status"
-      onclick="toggleStatusFilter()"
-    >
-      ☰
-    </button>
+   <button
+    class="filter-btn"
+    title="Filter by status"
+    onclick="toggleStatusFilter(event)"
+  >
+    ☰
+  </button>
+
 
     <!-- Hidden Status Filter -->
     <select
@@ -730,10 +750,24 @@ function confirmCreateList() {
 }
 
 
-function toggleStatusFilter() {
+function toggleStatusFilter(e) {
+  e.stopPropagation(); // prevent immediate close
   const dd = document.getElementById("statusFilter");
   dd.classList.toggle("show");
 }
+
+// Close status filter when clicking outside
+document.addEventListener("click", function () {
+  const dd = document.getElementById("statusFilter");
+  if (dd) dd.classList.remove("show");
+});
+
+// Prevent dropdown click from closing itself
+document
+  .getElementById("statusFilter")
+  .addEventListener("click", e => e.stopPropagation());
+
+  
 
   
   
