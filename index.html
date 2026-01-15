@@ -196,6 +196,10 @@ tbody tr:hover {
   color: #15803d;
 }
 
+.badge-passed {
+  background: #ede9fe;
+  color: #5b21b6;
+}
 
 
 
@@ -365,6 +369,13 @@ tbody tr:hover {
   min-width: 280px;
   text-align: center;
   box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+
+
+tr.passed-row {
+  background: #f5f3ff !important;
+}
+
+  
 }
 </style>
 </head>
@@ -547,6 +558,11 @@ function renderLists(lists) {
   lists.forEach(l => {
     const tr = document.createElement("tr");
 
+    if (l.status === "PASSED") {
+      tr.classList.add("passed-row");
+    }
+
+
     // 🔑 for filtering
     tr.dataset.status = l.status;
 
@@ -587,14 +603,20 @@ function renderLists(lists) {
           <div class="action-icon"
             title="Open List"
             onclick="openList('${l.listId}')"
-            ${l.status === "VERIFIED" ? 'style="pointer-events:none;opacity:.4"' : ""}>
+            ${["VERIFIED","PASSED"].includes(l.status)
+              ? 'style="pointer-events:none;opacity:.4"'
+              : ""}
+            >
             👁
           </div>
 
           <div class="action-icon"
             title="Edit List"
             onclick="editList('${l.listId}')"
-            ${l.status === "VERIFIED" ? 'style="pointer-events:none;opacity:.4"' : ""}>
+            ${["VERIFIED","PASSED"].includes(l.status)
+              ? 'style="pointer-events:none;opacity:.4"'
+              : ""}
+            >
             ✏
           </div>
 
@@ -626,6 +648,7 @@ function renderLists(lists) {
                  </div>`
               : ""
           }
+
 
         
         </div>
@@ -730,6 +753,9 @@ function showModal(t){document.getElementById("modal-text").innerText=t;document
 function closeModal(){document.getElementById("modal").style.display="none";}
 
 function renderStatus(status) {
+  if (status === "PASSED") {
+    return `<span class="badge badge-passed">PASSED</span>`;
+  }
   if (status === "VERIFIED") {
     return `<span class="badge badge-verified">VERIFIED</span>`;
   }
@@ -738,6 +764,7 @@ function renderStatus(status) {
   }
   return `<span class="badge badge-open">OPEN</span>`;
 }
+
 
 function filterLists() {
   const search = document.getElementById("listSearch").value.toLowerCase();
