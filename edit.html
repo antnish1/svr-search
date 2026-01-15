@@ -121,10 +121,72 @@ tbody tr:nth-child(even) {
 tbody tr:hover {
   background: #e0f2fe;
 }
+
+/* ================= LOADER ================= */
+.loader-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(255,255,255,.85);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+}
+
+.spinner {
+  width: 42px;
+  height: 42px;
+  border: 4px solid #cbd5e1;
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ================= MODAL ================= */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-box {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  min-width: 280px;
+  text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+}
 </style>
 </head>
 
 <body>
+
+<!-- LOADER -->
+<div id="loader" class="loader-overlay">
+  <div class="spinner"></div>
+</div>
+
+<!-- CONFIRM MODAL -->
+<div id="confirmModal" class="modal-overlay">
+  <div class="modal-box">
+    <div id="confirmText" style="margin-bottom:15px;font-weight:600"></div>
+    <button class="btn-danger" onclick="confirmDelete()">Yes, Delete</button>
+    <button onclick="closeConfirm()">Cancel</button>
+  </div>
+</div>
 
 <!-- TOP BAR -->
 <div class="top-bar">
@@ -156,6 +218,7 @@ tbody tr:hover {
         <th>Labour</th>
         <th>Distance</th>
         <th>TA+DA</th>
+        <th>Invoice</th>
         <th>SVR No</th>
         <th>Action</th>
       </tr>
@@ -166,15 +229,22 @@ tbody tr:hover {
 
 <script>
 const API_URL =
-  "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+"https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
 const params = new URLSearchParams(window.location.search);
 const LIST_ID = params.get("listId");
 
+let deleteRowIndex = null;
+
 document.getElementById("title").textContent =
   "Editing List : " + LIST_ID;
 
+showLoader(true);
 loadRows();
+
+function showLoader(s) {
+  document.getElementById("loader").style.display = s ? "flex" : "none";
+}
 
 function loadRows() {
   const cb = "rows_cb_" + Date.now();
@@ -182,6 +252,7 @@ function loadRows() {
 
   window[cb] = function (items) {
     render(items);
+    showLoader(false);
     delete window[cb];
     script.remove();
   };
@@ -198,12 +269,13 @@ function render(items) {
 
   if (!items.length) {
     tbody.innerHTML =
-      "<tr><td colspan='17'>No rows found</td></tr>";
+      "<tr><td colspan='18'>No rows found</td></tr>";
     return;
   }
 
   items.forEach(o => {
     const r = o.row;
+    const invoice = r[30] || ""; // AE
     const tr = document.createElement("tr");
 
     tr.innerHTML = `
@@ -222,9 +294,10 @@ function render(items) {
       <td>${r[22]}</td>
       <td>${r[23]}</td>
       <td>${r[27]}</td>
+      <td>${invoice}</td>
       <td>${r[1]}</td>
       <td>
-        <button class="btn-danger" onclick="del(${o.index})">
+        <button class="btn-danger" onclick="askDelete(${o.index})">
           Delete
         </button>
       </td>
@@ -234,23 +307,42 @@ function render(items) {
   });
 }
 
-function fmt(v) {
-  const d = new Date(v);
-  return isNaN(d) ? "" : d.toLocaleDateString("en-GB");
+function askDelete(rowIndex) {
+  deleteRowIndex = rowIndex;
+  document.getElementById("confirmText").innerText =
+    "Delete this row permanently?";
+  document.getElementById("confirmModal").classList.add("show");
 }
 
-function del(rowIndex) {
-  if (!confirm("Delete this row permanently?")) return;
+function closeConfirm() {
+  document.getElementById("confirmModal").classList.remove("show");
+  deleteRowIndex = null;
+}
+
+function confirmDelete() {
+  if (!deleteRowIndex) return;
+
+  closeConfirm();
+  showLoader(true);
 
   const cb = "del_cb_" + Date.now();
   let script;
 
-  window[cb] = () => loadRows();
+  window[cb] = () => {
+    loadRows();
+    delete window[cb];
+    script.remove();
+  };
 
   script = document.createElement("script");
   script.src =
-    `${API_URL}?action=deleteRow&rowIndex=${rowIndex}&callback=${cb}`;
+    `${API_URL}?action=deleteRow&rowIndex=${deleteRowIndex}&callback=${cb}`;
   document.body.appendChild(script);
+}
+
+function fmt(v) {
+  const d = new Date(v);
+  return isNaN(d) ? "" : d.toLocaleDateString("en-GB");
 }
 
 function goHome() {
