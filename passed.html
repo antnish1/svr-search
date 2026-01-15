@@ -26,6 +26,8 @@ button{padding:7px 14px;border-radius:4px;border:none;font-weight:600;cursor:poi
 .loader{display:none;position:fixed;inset:0;background:rgba(255,255,255,.85);align-items:center;justify-content:center;z-index:9999}
 .spinner{width:42px;height:42px;border:4px solid #cbd5e1;border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:center;justify-content:center;z-index:10000}
+.modal-box{background:#fff;padding:20px;border-radius:6px;text-align:center;min-width:260px}
 </style>
 </head>
 
@@ -33,9 +35,19 @@ button{padding:7px 14px;border-radius:4px;border:none;font-weight:600;cursor:poi
 
 <div id="loader" class="loader"><div class="spinner"></div></div>
 
+<div id="modal" class="modal">
+  <div class="modal-box">
+    <div id="modalText"></div><br>
+    <button class="btn-primary" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
 <div class="top-bar">
   <h1 id="title"></h1>
-  <button class="btn-primary" onclick="goHome()">⬅ Back</button>
+  <div>
+    <button class="btn-primary" onclick="saveAll()">Save Passed Amounts</button>
+    <button onclick="goHome()">⬅ Back</button>
+  </div>
 </div>
 
 <div class="card">
@@ -47,7 +59,7 @@ button{padding:7px 14px;border-radius:4px;border:none;font-weight:600;cursor:poi
         <th>Machine No</th>
         <th>TA+DA</th>
         <th>Passed Amount</th>
-        <th>Action</th>
+        <th>Status</th>
       </tr>
     </thead>
     <tbody id="tbody"></tbody>
@@ -55,15 +67,18 @@ button{padding:7px 14px;border-radius:4px;border:none;font-weight:600;cursor:poi
 </div>
 
 <script>
-const API_URL = "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
-const LIST_ID = new URLSearchParams(location.search).get("listId");
+const API_URL="https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
+const LIST_ID=new URLSearchParams(location.search).get("listId");
+document.getElementById("title").textContent="Mark Passed : "+LIST_ID;
 
-document.getElementById("title").textContent = "Mark Passed : " + LIST_ID;
+let rowMap=[];
 
 showLoader(true);
 loadRows();
 
 function showLoader(s){document.getElementById("loader").style.display=s?"flex":"none";}
+function showModal(t){document.getElementById("modalText").innerText=t;document.getElementById("modal").style.display="flex";}
+function closeModal(){document.getElementById("modal").style.display="none";}
 
 function loadRows(){
   const cb="rows_"+Date.now(); let s;
@@ -78,11 +93,12 @@ function loadRows(){
 
 function render(items){
   const tb=document.getElementById("tbody"); tb.innerHTML="";
-  if(!items.length){tb.innerHTML="<tr><td colspan='6'>No rows</td></tr>";return;}
-
+  rowMap=[];
   items.forEach(o=>{
     const r=o.row;
     const passed=r[31]; // AF
+    rowMap.push({rowIndex:o.index, passed});
+
     const tr=document.createElement("tr");
     tr.innerHTML=`
       <td>${fmt(r[28])}</td>
@@ -91,31 +107,44 @@ function render(items){
       <td>${r[27]}</td>
       <td>
         <input type="number" min="0" step="0.01"
-          value="${passed||""}" ${passed?"disabled":""} id="p_${o.index}">
+          id="p_${o.index}"
+          value="${passed ?? ""}"
+          ${passed!=="" && passed!==null ? "disabled" : ""}>
       </td>
-      <td>
-        ${passed
-          ? `<span style="color:var(--success);font-weight:700">LOCKED</span>`
-          : `<button class="btn-primary" onclick="save(${o.index})">Save</button>`
-        }
-      </td>`;
+      <td>${passed!=="" && passed!==null ? "PASSED" : "PENDING"}</td>
+    `;
     tb.appendChild(tr);
   });
 }
 
-function save(rowIndex){
-  const inp=document.getElementById("p_"+rowIndex);
-  const val=inp.value;
-  if(val==="" || Number(val)<0){alert("Enter valid amount");return;}
+function saveAll(){
+  const payload=[];
+  for(const r of rowMap){
+    const inp=document.getElementById("p_"+r.rowIndex);
+    if(inp.disabled) continue;
+
+    if(inp.value===""){
+      showModal("❌ All rows must have Passed Amount");
+      return;
+    }
+    payload.push({rowIndex:r.rowIndex, amount:inp.value});
+  }
+
+  if(!payload.length){
+    showModal("Nothing to save");
+    return;
+  }
 
   showLoader(true);
   const cb="save_"+Date.now(); let s;
   window[cb]=()=>{
-    showLoader(false); loadRows();
+    showLoader(false);
+    showModal("✅ Passed Amounts saved successfully");
+    loadRows();
     delete window[cb]; s.remove();
   };
   s=document.createElement("script");
-  s.src=`${API_URL}?action=savePassedAmount&rowIndex=${rowIndex}&amount=${encodeURIComponent(val)}&callback=${cb}`;
+  s.src=`${API_URL}?action=savePassedList&listId=${LIST_ID}&data=${encodeURIComponent(JSON.stringify(payload))}&callback=${cb}`;
   document.body.appendChild(s);
 }
 
