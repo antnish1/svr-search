@@ -119,16 +119,24 @@ function render(items){
 
 function saveAll(){
   const payload=[];
-  for(const r of rowMap){
-    const inp=document.getElementById("p_"+r.rowIndex);
-    if(inp.disabled) continue;
-
-    if(inp.value===""){
-      showModal("❌ All rows must have Passed Amount");
-      return;
+    for (const r of rowMap) {
+      const inp = document.getElementById("p_" + r.rowIndex);
+    
+      // locked row → OK
+      if (inp.disabled) continue;
+    
+      // blank is NOT allowed
+      if (inp.value === "") {
+        showModal("❌ All rows must have Passed Amount (0 allowed)");
+        return;
+      }
+    
+      payload.push({
+        rowIndex: r.rowIndex,
+        amount: inp.value
+      });
     }
-    payload.push({rowIndex:r.rowIndex, amount:inp.value});
-  }
+
 
   if(!payload.length){
     showModal("Nothing to save");
