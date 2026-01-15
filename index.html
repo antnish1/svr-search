@@ -490,7 +490,9 @@ tbody tr:hover {
         <th>Status</th>
         <th>SVR Count</th>
         <th>Total TA+DA</th>
+        <th>Passed Amount</th>
         <th>Actions</th>
+
       </tr>
     </thead>
     <tbody></tbody>
@@ -535,30 +537,50 @@ function renderLists(lists) {
   const tbody = document.querySelector("#listTable tbody");
   tbody.innerHTML = "";
 
+  // ⚠️ Updated colspan (now 8 columns)
   if (!lists.length) {
     tbody.innerHTML =
-      "<tr><td colspan='7'>No lists found</td></tr>";
+      "<tr><td colspan='8'>No lists found</td></tr>";
     return;
   }
 
   lists.forEach(l => {
     const tr = document.createElement("tr");
 
-    // 🔑 for future filtering
+    // 🔑 for filtering
     tr.dataset.status = l.status;
+
+    // Format amounts safely
+    const totalTaDa =
+      l.totalTaDa
+        ? "₹" + Number(l.totalTaDa).toLocaleString("en-IN")
+        : "";
+
+    const passedAmount =
+      l.passedAmount
+        ? "₹" + Number(l.passedAmount).toLocaleString("en-IN")
+        : "";
 
     tr.innerHTML = `
       <td>${l.listId}</td>
       <td>${l.date}</td>
       <td>${l.location}</td>
 
-      <!-- ✅ STATUS BADGE -->
+      <!-- STATUS -->
       <td>${renderStatus(l.status)}</td>
 
       <td style="font-weight:bold">${l.svrCount}</td>
-      <td style="font-weight:bold">${l.totalTaDa}</td>
 
-      <!-- ✅ ACTION ICONS -->
+      <td style="font-weight:bold">
+        ${totalTaDa}
+      </td>
+
+      <!-- ✅ PASSED AMOUNT -->
+      <td style="font-weight:bold; color:${passedAmount ? '#15803d' : '#9ca3af'}">
+        ${passedAmount}
+      </td>
+
+      <!-- ACTIONS -->
       <td>
         <div class="row-actions">
 
@@ -599,6 +621,7 @@ function renderLists(lists) {
     tbody.appendChild(tr);
   });
 }
+
 
 
 
