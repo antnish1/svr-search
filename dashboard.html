@@ -94,8 +94,9 @@ tbody tr:hover{
   background:#f1f5f9
 }
 
-.expand-row{
-  background:#f8fafc
+.details{
+  margin-top:16px;
+  display:none
 }
 
 /* ===== LOADER ===== */
@@ -132,7 +133,9 @@ tbody tr:hover{
 <div class="top" style="display:flex;justify-content:space-between;align-items:center">
   <div>
     <h2 style="margin:0">TA / DA Dashboard</h2>
-    <div style="font-size:12px;color:#6b7280">Verified & Passed Bills</div>
+    <div style="font-size:12px;color:#6b7280">
+      Verified & Passed Bills
+    </div>
   </div>
 
   <button onclick="goBack()" style="background:#e5e7eb;color:#111827">
@@ -146,7 +149,16 @@ tbody tr:hover{
     From <input type="date" id="from">
     To <input type="date" id="to">
     Machine <input type="text" id="machine" placeholder="Machine No">
-    Engineer <input type="text" id="engFilter" placeholder="Engineer name">
+
+    Engineer
+    <input
+      type="text"
+      id="engFilter"
+      placeholder="Engineer name"
+      list="engineerList"
+    >
+    <datalist id="engineerList"></datalist>
+
     <button onclick="load()">Apply</button>
   </div>
 </div>
@@ -159,7 +171,7 @@ tbody tr:hover{
 </div>
 
 <!-- ===== ENGINEER SUMMARY ===== -->
-<table>
+<table id="summary">
 <thead>
 <tr>
   <th>Engineer</th>
@@ -168,8 +180,27 @@ tbody tr:hover{
   <th>Total Passed</th>
 </tr>
 </thead>
-<tbody id="summaryBody"></tbody>
+<tbody></tbody>
 </table>
+
+<!-- ===== ENGINEER DETAILS ===== -->
+<div class="details" id="details">
+  <h3 id="dTitle"></h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Machine</th>
+        <th>Complaint</th>
+        <th>List</th>
+        <th>Status</th>
+        <th>TA+DA</th>
+        <th>Passed</th>
+      </tr>
+    </thead>
+    <tbody id="detailBody"></tbody>
+  </table>
+</div>
 
 <script>
 const API_URL =
@@ -179,9 +210,9 @@ const fromEl = document.getElementById("from");
 const toEl = document.getElementById("to");
 const machineEl = document.getElementById("machine");
 const engFilterEl = document.getElementById("engFilter");
+const engineerListEl = document.getElementById("engineerList");
 
 let cachedRows = [];
-let expandedEngineer = null;
 
 /* ===== DEFAULT DATES + AUTO LOAD ===== */
 (function init(){
@@ -225,14 +256,25 @@ function render(d){
   c3.textContent="₹"+d.totals.passed.toLocaleString();
 
   cachedRows=d.rows;
+
+  populateEngineerList(d.engineers);
   renderSummary(d.engineers);
+}
+
+function populateEngineerList(engineers){
+  engineerListEl.innerHTML="";
+  engineers.forEach(e=>{
+    const opt=document.createElement("option");
+    opt.value=e.engineer;
+    engineerListEl.appendChild(opt);
+  });
 }
 
 function renderSummary(engineers){
   const filter = engFilterEl.value.trim().toUpperCase();
-  const tbody = document.getElementById("summaryBody");
-  tbody.innerHTML="";
-  expandedEngineer=null;
+  const tb=document.querySelector("#summary tbody");
+  tb.innerHTML="";
+  details.style.display="none";
 
   engineers
     .filter(e=>!filter || e.engineer.includes(filter))
@@ -240,39 +282,27 @@ function renderSummary(engineers){
       const tr=document.createElement("tr");
       tr.innerHTML=`
         <td style="cursor:pointer;color:#1d4ed8;font-weight:600"
-            onclick="toggleEngineer('${e.engineer}', this)">
+            onclick="showDetails('${e.engineer}')">
           ${e.engineer}
         </td>
         <td>${e.calls}</td>
         <td>₹${e.tada.toLocaleString()}</td>
         <td>₹${e.passed.toLocaleString()}</td>
       `;
-      tbody.appendChild(tr);
+      tb.appendChild(tr);
     });
 }
 
-function toggleEngineer(engineer, row){
-  if(expandedEngineer===engineer){
-    removeExpanded();
-    expandedEngineer=null;
-    return;
-  }
+function showDetails(engineer){
+  details.style.display="block";
+  dTitle.textContent="Engineer: " + engineer;
+  detailBody.innerHTML="";
 
-  removeExpanded();
-  expandedEngineer=engineer;
-
-  const rows=cachedRows.filter(r=>r.engineer===engineer);
-
-  let html=`<tr class="expand-row"><td colspan="4">
-    <table style="width:100%">
-      <tr>
-        <th>Date</th><th>Machine</th><th>Complaint</th>
-        <th>List</th><th>Status</th><th>TA+DA</th><th>Passed</th>
-      </tr>`;
-
-  rows.forEach(r=>{
-    html+=`
-      <tr>
+  cachedRows
+    .filter(r=>r.engineer===engineer)
+    .forEach(r=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
         <td>${r.date}</td>
         <td>${r.machine}</td>
         <td>${r.complaint}</td>
@@ -280,15 +310,9 @@ function toggleEngineer(engineer, row){
         <td>${r.status}</td>
         <td>${r.tada}</td>
         <td>${r.passed}</td>
-      </tr>`;
-  });
-
-  html+=`</table></td></tr>`;
-  row.insertAdjacentHTML("afterend", html);
-}
-
-function removeExpanded(){
-  document.querySelectorAll(".expand-row").forEach(r=>r.remove());
+      `;
+      detailBody.appendChild(tr);
+    });
 }
 
 function goBack(){
