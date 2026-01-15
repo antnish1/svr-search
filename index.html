@@ -96,6 +96,19 @@ button:hover {
   color: white;
 }
 
+
+.btn-secondary {
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 2px solid var(--border);
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+
+  
 /* ================= CARD ================= */
 .card {
   background: var(--card);
@@ -493,11 +506,18 @@ tr.passed-row {
 
 
   <!-- RIGHT: CREATE LIST -->
-  <div class="create-list">
-    
-    <button class="btn-primary" onclick="openCreateListModal()">Create List</button>
+  <div class="create-list" style="gap:8px">
 
+    <button class="btn-secondary" onclick="openDashboard()">
+      📊 Dashboard
+    </button>
+  
+    <button class="btn-primary" onclick="openCreateListModal()">
+      ➕ Create List
+    </button>
+  
   </div>
+
 
 </div>
 
@@ -850,6 +870,13 @@ function markPassed(listId) {
   window.location.href = "passed.html?listId=" + listId;
 }
 
+
+
+function openDashboard() {
+  window.location.href = "dashboard.html";
+}
+
+  
   
 // Close status filter when clicking outside
 document.addEventListener("click", function () {
