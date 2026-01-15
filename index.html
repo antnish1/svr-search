@@ -265,6 +265,62 @@ tbody tr:hover {
 }
 
 
+
+/* Wider search input */
+.search-input {
+  width: 420px;
+  padding: 8px 14px;
+  border-radius: 20px;
+  border: 2px solid var(--border);
+  font-size: 13px;
+  background: #f8fafc;
+}
+
+.search-input:focus {
+  outline: none;
+  background: #ffffff;
+  border-color: var(--primary);
+}
+
+/* Filter icon + dropdown */
+.filter-wrapper {
+  position: relative;
+}
+
+.filter-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background: #ffffff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.filter-btn:hover {
+  background: #f1f5f9;
+}
+
+/* Hidden dropdown */
+.status-dropdown {
+  position: absolute;
+  top: 42px;
+  right: 0;
+  display: none;
+  min-width: 140px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 2px solid var(--border);
+  background: white;
+  z-index: 50;
+}
+
+/* Show when active */
+.status-dropdown.show {
+  display: block;
+}
+
+
   
 /* ================= MODAL ================= */
 .modal-overlay {
@@ -355,21 +411,41 @@ tbody tr:hover {
   </div>
 
   <!-- CENTER: SEARCH + FILTER -->
-  <div class="top-search">
-    <input
-      type="text"
-      id="listSearch"
-      placeholder="Search lists by ID, location…"
-      onkeyup="filterLists()"
-    >
+ <div class="top-search">
 
-    <select id="statusFilter" onchange="filterLists()">
+  <input
+    type="text"
+    id="listSearch"
+    placeholder="Search lists by ID or location…"
+    onkeyup="filterLists()"
+    class="search-input"
+  >
+
+  <!-- Filter Icon -->
+  <div class="filter-wrapper">
+    <button
+      class="filter-btn"
+      title="Filter by status"
+      onclick="toggleStatusFilter()"
+    >
+      ☰
+    </button>
+
+    <!-- Hidden Status Filter -->
+    <select
+      id="statusFilter"
+      onchange="filterLists()"
+      class="status-dropdown"
+    >
       <option value="">All Status</option>
       <option value="OPEN">Open</option>
       <option value="CLOSED">Closed</option>
       <option value="VERIFIED">Verified</option>
     </select>
   </div>
+
+</div>
+
 
   <!-- RIGHT: CREATE LIST -->
   <div class="create-list">
@@ -654,7 +730,11 @@ function confirmCreateList() {
 }
 
 
-  
+function toggleStatusFilter() {
+  const dd = document.getElementById("statusFilter");
+  dd.classList.toggle("show");
+}
+
   
   
   
