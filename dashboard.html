@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TA/DA Dashboard</title>
+
+<style>
+body{font-family:system-ui,Arial;background:#eef2f7;padding:20px;font-size:13px}
+.top{background:#fff;border:2px solid #cbd5e1;border-radius:8px;padding:14px;margin-bottom:16px}
+.filters{display:flex;gap:10px;align-items:center}
+input{padding:7px;border:2px solid #cbd5e1;border-radius:4px}
+button{padding:7px 14px;border:none;border-radius:4px;background:#1d4ed8;color:#fff;font-weight:600;cursor:pointer}
+
+.cards{display:flex;gap:14px;margin-bottom:16px}
+.card{flex:1;background:#fff;border:2px solid #cbd5e1;border-radius:8px;padding:14px;text-align:center}
+.card h3{margin:0;font-size:12px;color:#6b7280}
+.card div{font-size:20px;font-weight:700;margin-top:6px}
+
+table{width:100%;border-collapse:collapse;background:#fff;border:2px solid #cbd5e1;border-radius:8px;overflow:hidden}
+th,td{padding:8px;border-bottom:1px solid #cbd5e1;text-align:center}
+th{background:#e2e8f0;font-size:12px}
+tbody tr:hover{background:#f1f5f9}
+
+.details{margin-top:16px;display:none}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <h2>TA / DA Dashboard</h2>
+  <div class="filters">
+    From <input type="date" id="from">
+    To <input type="date" id="to">
+    Machine <input type="text" id="machine" placeholder="Optional">
+    <button onclick="load()">Apply</button>
+  </div>
+</div>
+
+<div class="cards">
+  <div class="card"><h3>Total Calls</h3><div id="c1">0</div></div>
+  <div class="card"><h3>Total TA+DA</h3><div id="c2">₹0</div></div>
+  <div class="card"><h3>Total Passed</h3><div id="c3">₹0</div></div>
+</div>
+
+<table id="summary">
+<thead>
+<tr>
+  <th>Engineer</th>
+  <th>Calls</th>
+  <th>Total TA+DA</th>
+  <th>Total Passed</th>
+</tr>
+</thead>
+<tbody></tbody>
+</table>
+
+<div class="details" id="details">
+  <h3 id="dTitle"></h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th><th>Machine</th><th>Complaint</th>
+        <th>List</th><th>Status</th><th>TA+DA</th><th>Passed</th>
+      </tr>
+    </thead>
+    <tbody id="detailBody"></tbody>
+  </table>
+</div>
+
+<script>
+const API_URL="YOUR_WEB_APP_URL_HERE";
+
+let cachedRows=[];
+
+function load(){
+  const from=fromEl.value,to=toEl.value;
+  if(!from||!to){alert("Select date range");return;}
+  const cb="dash_"+Date.now();let s;
+  window[cb]=data=>{
+    render(data);delete window[cb];s.remove();
+  };
+  s=document.createElement("script");
+  s.src=`${API_URL}?action=getDashboardData&from=${from}&to=${to}&machine=${machineEl.value}&callback=${cb}`;
+  document.body.appendChild(s);
+}
+
+const fromEl=from,toEl=to,machineEl=machine;
+
+function render(d){
+  c1.textContent=d.totals.calls;
+  c2.textContent="₹"+d.totals.tada.toLocaleString();
+  c3.textContent="₹"+d.totals.passed.toLocaleString();
+
+  const tb=document.querySelector("#summary tbody");
+  tb.innerHTML="";
+  cachedRows=d.rows;
+
+  d.engineers.forEach(e=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td style="cursor:pointer;color:#1d4ed8;font-weight:600"
+          onclick="showDetails('${e.engineer}')">${e.engineer}</td>
+      <td>${e.calls}</td>
+      <td>₹${e.tada.toLocaleString()}</td>
+      <td>₹${e.passed.toLocaleString()}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function showDetails(engineer){
+  details.style.display="block";
+  dTitle.textContent="Engineer: "+engineer;
+  detailBody.innerHTML="";
+  cachedRows.filter(r=>r.engineer===engineer)
+    .forEach(r=>{
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td>${r.date}</td><td>${r.machine}</td><td>${r.complaint}</td>
+        <td>${r.listId}</td><td>${r.status}</td>
+        <td>${r.tada}</td><td>${r.passed}</td>`;
+      detailBody.appendChild(tr);
+    });
+}
+</script>
+
+</body>
+</html>
