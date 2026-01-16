@@ -713,6 +713,24 @@ function handleRowSelection(cb, rowData) {
     return;
   }
 
+  /* ==================================================
+     🚫 WORKSHOP BLOCK (SAFE ADDITION)
+     Column C → rowData[2]
+  ================================================== */
+  const wsOs = String(rowData[2] || "").trim();
+
+  if (wsOs === "Workshop") {
+    cb.checked = false;
+
+    showConfirm(
+      "Workshop calls are not eligible for TA/DA",
+      () => {}
+    );
+
+    return; // 🔥 STOP — nothing else runs
+  }
+  /* ================================================== */
+
   pendingCheckbox = cb;
   pendingRow = rowData;
   pendingInvoice = "";
@@ -722,16 +740,17 @@ function handleRowSelection(cb, rowData) {
     .trim()
     .toUpperCase();
 
-  // 🚨 SERVICE FLOW
+  // 🚨 SERVICE FLOW (UNCHANGED)
   if (status === "SERVICE") {
     pendingIsService = true;
     openInvModal(cb, rowData);
     return;
   }
 
-  // ✅ NORMAL FLOW
+  // ✅ NORMAL FLOW (UNCHANGED)
   openSVRModal(cb, rowData);
 }
+
 
 
 
