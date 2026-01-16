@@ -565,6 +565,14 @@ function search() {
   s = document.createElement("script");
   s.src = `${API_URL}?action=search&machine=${m}&from=${from.value}&to=${to.value}&callback=${cb}`;
   document.body.appendChild(s);
+
+  window[cb] = d => {
+    console.log("SEARCH RESPONSE", d);
+    processedKeys = d.processedKeys || {};
+    render(d.rows || []);
+    ...
+  };
+
 }
 
 
@@ -618,7 +626,11 @@ function render(rows) {
       .trim();
 
     const key = `${dateKey}|${engineer}|${machine}`;
-    const info = processedKeys[key];
+    const info =
+      processedKeys[key] && typeof processedKeys[key] === "object"
+        ? processedKeys[key]
+        : null;
+
     const isProcessed = !!info;
     
     // ignore rows from current list
