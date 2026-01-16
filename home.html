@@ -119,6 +119,19 @@ button[onclick*="Cancel"] {
   border-color: #7f1d1d;
 }
 
+
+
+/* ===== DUPLICATE ROW COLORS ===== */
+.row-passed {
+  background-color: #dcfce7 !important; /* light green */
+}
+
+.row-processed {
+  background-color: #ffe4e6 !important; /* light pink */
+}
+
+
+  
 /* ================= TABLE (STRONG SEPARATION) ================= */
 table {
   width: 100%;
@@ -605,7 +618,13 @@ function render(rows) {
       .trim();
 
     const key = `${dateKey}|${engineer}|${machine}`;
-    const isProcessed = processedKeys[key] === true;
+    const info = processedKeys[key];
+    const isProcessed = !!info;
+    
+    // ignore rows from current list
+    const isSameList =
+      info && info.listId === LIST_ID;
+    
 
     console.log("CHECK KEY:", key, processedKeys[key]);
 
@@ -647,10 +666,16 @@ function render(rows) {
     tr.appendChild(td(textCell(r[25]))); // TA+DA
 
     /* ===== PROCESSED UI ===== */
-    if (isProcessed) {
-      tr.style.backgroundColor = "#d9f7d9";
-      tr.title = "Already processed";
+    if (isProcessed && !isSameList) {
+      if (info.status === "PASSED") {
+        tr.classList.add("row-passed");
+        tr.title = "Already processed (PASSED)";
+      } else {
+        tr.classList.add("row-processed");
+        tr.title = "Already processed (" + info.status + ")";
+      }
     }
+
 
     tbody.appendChild(tr);
   });
