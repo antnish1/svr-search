@@ -480,7 +480,7 @@ function saveInvoice() {
 
 
 function invoiceNotAvailable() {
-  pendingInvoice = "INV_";
+  pendingInvoice = "INV____________";
   closeInvoiceModal();
 
   // 🔥 RESUME NORMAL FLOW
@@ -491,7 +491,7 @@ function invoiceNotAvailable() {
   
 
 function markInvNA() {
-  pendingInvoice = "INV_";
+  pendingInvoice = "INV____________";
 
   document.getElementById("invModal").classList.remove("show");
 
