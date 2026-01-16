@@ -540,11 +540,10 @@ function inputCell(value) {
   
 function search() {
   const m = machine.value.trim();
-   if (!m) {
+  if (!m) {
     showConfirm("Please enter Machine Number", () => {});
     return;
   }
-
 
   showLoader(true);
 
@@ -552,21 +551,31 @@ function search() {
   let s;
 
   window[cb] = d => {
+    console.log("SEARCH RESPONSE", d); // ✅ keep this for debug
+
     processedKeys = d.processedKeys || {};
     render(d.rows || []);
+
     if (d.listStatus === "VERIFIED") {
       lockVerifiedListUI();
     }
+
     showLoader(false);
     delete window[cb];
     s.remove();
   };
 
   s = document.createElement("script");
-  s.src = `${API_URL}?action=search&machine=${m}&from=${from.value}&to=${to.value}&callback=${cb}`;
-  document.body.appendChild(s);
+  s.src =
+    `${API_URL}?action=search` +
+    `&machine=${encodeURIComponent(m)}` +
+    `&from=${from.value}` +
+    `&to=${to.value}` +
+    `&callback=${cb}`;
 
+  document.body.appendChild(s);
 }
+
 
 
 
