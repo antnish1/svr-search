@@ -190,14 +190,21 @@ tbody tr:hover{
     <thead>
       <tr>
         <th>Date</th>
-        <th>Machine</th>
+        <th>Machine No</th>
+        <th>Customer</th>
         <th>Complaint</th>
-        <th>List</th>
+        <th>Call Type</th>
+        <th>Site Location</th>
+        <th>Call ID</th>
+        <th>Distance</th>
+        <th>SVR No</th>
+        <th>List ID</th>
         <th>Status</th>
         <th>TA+DA</th>
         <th>Passed</th>
       </tr>
-    </thead>
+      </thead>
+
     <tbody id="detailBody"></tbody>
   </table>
 </div>
@@ -294,26 +301,35 @@ function renderSummary(engineers){
 }
 
 function showDetails(engineer){
-  details.style.display="block";
-  dTitle.textContent="Engineer: " + engineer;
-  detailBody.innerHTML="";
+  details.style.display = "block";
+  dTitle.textContent = "Engineer: " + engineer;
+  detailBody.innerHTML = "";
 
   cachedRows
-    .filter(r=>r.engineer===engineer)
-    .forEach(r=>{
-      const tr=document.createElement("tr");
-      tr.innerHTML=`
-        <td>${r.date}</td>
-        <td>${r.machine}</td>
-        <td>${r.complaint}</td>
-        <td>${r.listId}</td>
-        <td>${r.status}</td>
-        <td>${r.tada}</td>
-        <td>${r.passed}</td>
+    .filter(r => r.engineer === engineer)
+    .forEach(r => {
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${r.date || ""}</td>
+        <td>${r.machine || ""}</td>
+        <td>${r.customer || ""}</td>
+        <td>${r.complaint || ""}</td>
+        <td>${r.callType || ""}</td>
+        <td>${r.siteLocation || ""}</td>
+        <td>${r.callId || ""}</td>
+        <td>${r.distance || ""}</td>
+        <td>${r.svrNo || ""}</td>
+        <td>${r.listId || ""}</td>
+        <td>${r.status || ""}</td>
+        <td>${r.tada || ""}</td>
+        <td>${r.passed || ""}</td>
       `;
+
       detailBody.appendChild(tr);
     });
 }
+
 
 function goBack(){
   window.location.href="index.html";
