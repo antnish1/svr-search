@@ -274,10 +274,17 @@ tr[title="Already processed"] {
 <div id="modal" class="modal-overlay">
   <div class="modal-box">
     <div id="modal-text"></div><br>
-    <button onclick="confirmYes()">Yes</button>
-    <button onclick="closeModal()">No</button>
+
+    <div id="modal-actions">
+      <button id="modalYes" onclick="confirmYes()">Yes</button>
+      <button id="modalNo" onclick="closeModal()">No</button>
+      <button id="modalOk" onclick="closeModal()" style="display:none">
+        OK
+      </button>
+    </div>
   </div>
 </div>
+
 
 <!-- ================= SVR INPUT MODAL ================= -->
 <div id="svrModal" class="modal-overlay">
@@ -722,10 +729,7 @@ function handleRowSelection(cb, rowData) {
   if (wsOs === "Workshop") {
     cb.checked = false;
 
-    showConfirm(
-      "Workshop calls are not eligible for TA/DA",
-      () => {}
-    );
+    showAlert("Workshop calls are not eligible for TA/DA");
 
     return; // 🔥 STOP — nothing else runs
   }
@@ -920,9 +924,15 @@ let confirmAction = null;
 
 function showConfirm(message, onYes) {
   modalText.innerText = message;
+
+  document.getElementById("modalYes").style.display = "inline-block";
+  document.getElementById("modalNo").style.display = "inline-block";
+  document.getElementById("modalOk").style.display = "none";
+
   confirmAction = onYes;
   modal.classList.add("show");
 }
+
 
 function closeModal() {
   modal.classList.remove("show");
@@ -1021,6 +1031,20 @@ function finalizeRowUI(tr, rowData) {
   tr.dataset.editing = "0";
 }
 
+
+function showAlert(message) {
+  modalText.innerText = message;
+
+  // show only OK button
+  document.getElementById("modalYes").style.display = "none";
+  document.getElementById("modalNo").style.display = "none";
+  document.getElementById("modalOk").style.display = "inline-block";
+
+  confirmAction = null;
+  modal.classList.add("show");
+}
+
+  
 
 // ================= KEYBOARD SHORTCUTS =================
 document.addEventListener("keydown", function (e) {
