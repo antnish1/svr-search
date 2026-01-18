@@ -499,6 +499,7 @@ tr.passed-row {
       <option value="OPEN">Open</option>
       <option value="CLOSED">Closed</option>
       <option value="VERIFIED">Verified</option>
+      <option value="PASSED">Passed</option>
     </select>
   </div>
 
@@ -511,7 +512,13 @@ tr.passed-row {
     <button class="btn-secondary" onclick="openDashboard()">
       📊 Dashboard
     </button>
-  
+
+
+    <button id="loadAllBtn" onclick="loadAllLists()">
+      📋 Load All Lists
+    </button>
+
+    
     <button class="btn-primary" onclick="openCreateListModal()">
       ➕ Create List
     </button>
@@ -555,8 +562,26 @@ const API_URL =
 "https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
 showLoader(true);
-loadLists();
+//loadLists();
 
+
+function loadAllLists() {
+  const btn = document.getElementById("loadAllBtn");
+
+  btn.disabled = true;
+  btn.textContent = "Loading…";
+
+  showLoader(true);
+  loadLists(); // 🔥 your EXISTING function
+
+  // restore button after load
+  setTimeout(() => {
+    btn.textContent = "📋 Load All Lists";
+    btn.disabled = false;
+  }, 800);
+}
+
+  
 function loadLists() {
   const cb = "lists_cb_" + Date.now();
   let s;
