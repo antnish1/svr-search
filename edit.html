@@ -316,15 +316,22 @@ function closeConfirm() {
 }
 
 function confirmDelete() {
-  if (!deletePayload) return;
+  if (!deletePayload) {
+    showLoader(false);
+    return;
+  }
 
-  closeConfirm();
+  // ✅ COPY payload BEFORE clearing modal
+  const payload = { ...deletePayload };
+
+  closeConfirm(); // safe now
   showLoader(true);
 
   const cb = "del_cb_" + Date.now();
   let script;
 
   window[cb] = () => {
+    showLoader(false);
     loadRows();
     delete window[cb];
     script.remove();
@@ -334,13 +341,14 @@ function confirmDelete() {
   script.src =
     `${API_URL}?action=deleteRowByKey` +
     `&listId=${encodeURIComponent(LIST_ID)}` +
-    `&date=${encodeURIComponent(deletePayload.date)}` +
-    `&engineer=${encodeURIComponent(deletePayload.engineer)}` +
-    `&machine=${encodeURIComponent(deletePayload.machine)}` +
+    `&date=${encodeURIComponent(payload.date)}` +
+    `&engineer=${encodeURIComponent(payload.engineer)}` +
+    `&machine=${encodeURIComponent(payload.machine)}` +
     `&callback=${cb}`;
 
   document.body.appendChild(script);
 }
+
 
 function fmt(v) {
   const d = new Date(v);
