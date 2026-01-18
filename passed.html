@@ -67,11 +67,13 @@ button{padding:7px 14px;border-radius:4px;border:none;font-weight:600;cursor:poi
 </div>
 
 <script>
-const API_URL="https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
-const LIST_ID=new URLSearchParams(location.search).get("listId");
-document.getElementById("title").textContent="Mark Passed : "+LIST_ID;
+const API_URL =
+"https://script.google.com/macros/s/AKfycbwDNZYXD4OkYwOvJ6NoqEsVSZGzyj4_euck_ZGz61Cd5GjKfVfbww8Fyk8t5N-zrJA/exec";
 
-let rowMap=[];
+const LIST_ID = new URLSearchParams(location.search).get("listId");
+document.getElementById("title").textContent = "Mark Passed : " + LIST_ID;
+
+let rowMap = [];
 
 showLoader(true);
 loadRows();
@@ -92,22 +94,29 @@ function loadRows(){
 }
 
 function render(items){
-  const tb=document.getElementById("tbody"); tb.innerHTML="";
+  const tb=document.getElementById("tbody");
+  tb.innerHTML="";
   rowMap=[];
+
   items.forEach(o=>{
     const r=o.row;
     const passed=r[31]; // AF
-    rowMap.push({rowIndex:o.index, passed});
+
+    const date     = r[28];
+    const engineer = String(r[3]).trim().toUpperCase();
+    const machine  = String(r[10]).replace(/\.0$/, "").trim();
+
+    rowMap.push({ date, engineer, machine, passed });
 
     const tr=document.createElement("tr");
     tr.innerHTML=`
-      <td>${fmt(r[28])}</td>
-      <td>${r[3]}</td>
-      <td>${r[10]}</td>
+      <td>${fmt(date)}</td>
+      <td>${engineer}</td>
+      <td>${machine}</td>
       <td>${r[27]}</td>
       <td>
         <input type="number" min="0" step="0.01"
-          id="p_${o.index}"
+          data-key="${date}|${engineer}|${machine}"
           value="${passed ?? ""}"
           ${passed!=="" && passed!==null ? "disabled" : ""}>
       </td>
@@ -119,24 +128,24 @@ function render(items){
 
 function saveAll(){
   const payload=[];
-    for (const r of rowMap) {
-      const inp = document.getElementById("p_" + r.rowIndex);
-    
-      // locked row → OK
-      if (inp.disabled) continue;
-    
-      // blank is NOT allowed
-      if (inp.value === "") {
-        showModal("❌ All rows must have Passed Amount (0 allowed)");
-        return;
-      }
-    
-      payload.push({
-        rowIndex: r.rowIndex,
-        amount: inp.value
-      });
+
+  document.querySelectorAll("input[type=number]").forEach(inp=>{
+    if (inp.disabled) return;
+
+    if (inp.value === "") {
+      showModal("❌ All rows must have Passed Amount (0 allowed)");
+      return;
     }
 
+    const [date, engineer, machine] = inp.dataset.key.split("|");
+
+    payload.push({
+      date,
+      engineer,
+      machine,
+      amount: inp.value
+    });
+  });
 
   if(!payload.length){
     showModal("Nothing to save");
@@ -151,12 +160,21 @@ function saveAll(){
     loadRows();
     delete window[cb]; s.remove();
   };
+
   s=document.createElement("script");
-  s.src=`${API_URL}?action=savePassedList&listId=${LIST_ID}&data=${encodeURIComponent(JSON.stringify(payload))}&callback=${cb}`;
+  s.src=
+    `${API_URL}?action=savePassedList` +
+    `&listId=${LIST_ID}` +
+    `&data=${encodeURIComponent(JSON.stringify(payload))}` +
+    `&callback=${cb}`;
+
   document.body.appendChild(s);
 }
 
-function fmt(v){const d=new Date(v);return isNaN(d)?"":d.toLocaleDateString("en-GB");}
+function fmt(v){
+  const d=new Date(v);
+  return isNaN(d)?"":d.toLocaleDateString("en-GB");
+}
 function goHome(){location.href="index.html";}
 </script>
 
