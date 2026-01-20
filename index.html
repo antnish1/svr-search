@@ -161,11 +161,28 @@ button {
 
 /* ================= CARD ================= */
 .card {
-  background: var(--card);
-  border: 2px solid var(--border);
-  border-radius: 8px;
-  padding: 16px;
+  background: linear-gradient(
+    180deg,
+    #ffffff 0%,
+    #f9fafb 100%
+  );
+  border: 2px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 18px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
+
+/* Section title */
+.card h3 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  border-left: 6px solid var(--yellow);
+  padding-left: 10px;
+}
+
 
 /* ================= TABLE ================= */
 table {
@@ -178,11 +195,18 @@ table {
 }
 
 th {
-  background: #e2e8f0;
+  background: linear-gradient(
+    180deg,
+    #facc15 0%,
+    #fde047 100%
+  );
+  color: #111;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   padding: 10px;
+  border-bottom: 2px solid #eab308;
 }
+
 
 td {
   padding: 9px;
@@ -200,6 +224,28 @@ tbody tr:hover {
 }
 
 
+
+.badge-open {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.badge-closed {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.badge-verified {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-passed {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+  
 
 .modal-overlay {
   display: none;
@@ -289,6 +335,46 @@ tbody tr:hover {
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+
+
+/* Base row style */
+#listTable tbody tr {
+  transition: background 0.2s ease;
+}
+
+/* OPEN */
+#listTable tbody tr[data-status="OPEN"] {
+  background: #ffffff;
+  border-left: 5px solid #3b82f6; /* blue */
+}
+
+/* CLOSED */
+#listTable tbody tr[data-status="CLOSED"] {
+  background: #f9fafb;
+  border-left: 5px solid #6b7280; /* gray */
+}
+
+/* VERIFIED */
+#listTable tbody tr[data-status="VERIFIED"] {
+  background: #f0fdf4;
+  border-left: 5px solid #16a34a; /* green */
+}
+
+/* PASSED */
+#listTable tbody tr[data-status="PASSED"] {
+  background: #faf5ff;
+  border-left: 5px solid #7c3aed; /* purple */
+}
+
+/* Hover enhancement */
+#listTable tbody tr:hover {
+  background: #e0f2fe !important;
+}
+
+
+
+  
 </style>
 </head>
 
