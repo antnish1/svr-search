@@ -202,10 +202,10 @@ tbody tr:hover {
 
 
 .modal-overlay {
-  display: none;                 /* 🔑 THIS WAS MISSING */
+  display: none;
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.55);
+  background: rgba(0, 0, 0, 0.65);   /* 🔥 darker backdrop */
   z-index: 10000;
   align-items: center;
   justify-content: center;
@@ -214,6 +214,20 @@ tbody tr:hover {
 .modal-overlay.show {
   display: flex;
 }
+
+
+.modal-box {
+  background: #ffffff;               /* ✅ solid white */
+  border-radius: 10px;
+  padding: 24px 26px;
+  min-width: 320px;
+  max-width: 90%;
+  box-shadow: 0 25px 60px rgba(0,0,0,0.45); /* 🔥 strong elevation */
+  animation: popIn 0.2s ease-out;
+}
+
+  
+  
 
 
 .row-actions {
@@ -238,7 +252,17 @@ tbody tr:hover {
 }
 
   
-  
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
   
 
   
