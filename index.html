@@ -269,7 +269,14 @@ tbody tr:hover {
   <!-- RIGHT -->
   <div class="create-list">
     <button class="btn-secondary" onclick="openDashboard()">📊 Dashboard</button>
-    <button class="btn-secondary" onclick="loadAllLists()">📋 Load All Lists</button>
+    <button
+      id="loadAllBtn"
+      class="btn-secondary"
+      onclick="loadAllLists()"
+    >
+      📋 Load All Lists
+    </button>
+
     <button class="btn-primary" onclick="openCreateListModal()">➕ Create List</button>
   </div>
 
@@ -300,6 +307,47 @@ tbody tr:hover {
   </table>
 </div>
 
+
+
+<!-- ================= GENERIC MODAL ================= -->
+<div id="modal" class="modal-overlay">
+  <div class="modal-box">
+    <div id="modal-text" style="margin-bottom:12px"></div>
+    <button class="btn-primary" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<!-- ================= CREATE LIST MODAL ================= -->
+<div id="createListModal" class="modal-overlay">
+  <div class="modal-box">
+
+    <h3 style="margin-top:0">Create New List</h3>
+    <p style="font-size:12px;color:#6b7280">
+      Select location for this list
+    </p>
+
+    <div style="margin:14px 0;text-align:left">
+      <label style="display:block;margin-bottom:6px">
+        <input type="radio" name="listLocation" value="Branch">
+        Branch Office
+      </label>
+
+      <label style="display:block">
+        <input type="radio" name="listLocation" value="Head Office">
+        Head Office
+      </label>
+    </div>
+
+    <div style="margin-top:16px">
+      <button class="btn-primary" onclick="confirmCreateList()">Create</button>
+      <button class="btn-secondary" onclick="closeCreateListModal()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+
+
+  
 </body>
 </html>
 
