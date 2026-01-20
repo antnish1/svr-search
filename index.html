@@ -289,6 +289,9 @@ tbody tr:hover {
   flex-shrink: 0;
 }
 
+.action-icon {
+  cursor: pointer;
+}
 
 
 .action-icon {
@@ -297,6 +300,69 @@ tbody tr:hover {
   font-size: 13px;
 }
 
+
+.action-icon {
+  transition: 
+    background 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+}
+
+/* Hover feedback */
+.action-icon:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.18);
+  border-color: var(--yellow);
+}
+
+
+/* Open / View */
+.action-icon[title*="Open"]:hover {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+/* Edit */
+.action-icon[title*="Edit"]:hover {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Preview */
+.action-preview:hover {
+  background: #bae6fd;
+  color: #075985;
+}
+
+/* Verify */
+.action-icon[title*="Verify"]:hover {
+  background: #dcfce7;
+  color: #166534;
+}
+
+/* Mark Passed */
+.action-icon[title*="Mark"]:hover {
+  background: #ede9fe;
+  color: #6d28d9;
+}
+
+
+.action-icon[style*="pointer-events:none"] {
+  opacity: 0.4;
+}
+
+.action-icon[style*="pointer-events:none"]:hover {
+  transform: none;
+  box-shadow: none;
+  background: inherit;
+  cursor: not-allowed;
+}
+
+
+  
+  
+  
   
 @keyframes popIn {
   from {
