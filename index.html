@@ -199,6 +199,49 @@ tbody tr:hover {
   background: #e0f2fe;
 }
 
+
+
+.modal-overlay {
+  display: none;                 /* 🔑 THIS WAS MISSING */
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.55);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+
+.row-actions {
+  display: flex;
+  flex-direction: row;        /* 🔑 FORCE horizontal */
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;        /* 🔑 prevents wrapping */
+}
+
+.action-icon {
+  flex-shrink: 0;
+}
+
+
+
+.action-icon {
+  width: 26px;
+  height: 26px;
+  font-size: 13px;
+}
+
+  
+  
+  
+
+  
 /* ================= LOADER ================= */
 .loader-overlay {
   display: none;
