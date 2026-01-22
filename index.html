@@ -625,7 +625,6 @@ function renderLists(lists) {
   const tbody = document.querySelector("#listTable tbody");
   tbody.innerHTML = "";
 
-  // ⚠️ Updated colspan (now 8 columns)
   if (!lists.length) {
     tbody.innerHTML =
       "<tr><td colspan='8'>No lists found</td></tr>";
@@ -638,7 +637,6 @@ function renderLists(lists) {
     if (l.status === "PASSED") {
       tr.classList.add("passed-row");
     }
-
 
     // 🔑 for filtering
     tr.dataset.status = l.status;
@@ -677,9 +675,10 @@ function renderLists(lists) {
       <td>
         <div class="row-actions">
 
+          <!-- 🔒 OPEN LIST (PIN PROTECTED) -->
           <div class="action-icon"
             title="Open List"
-            onclick="openList('${l.listId}')"
+            onclick="openList('${l.listId}', '${l.location}')"
             ${["VERIFIED","PASSED"].includes(l.status)
               ? 'style="pointer-events:none;opacity:.4"'
               : ""}
@@ -687,9 +686,10 @@ function renderLists(lists) {
             👁
           </div>
 
+          <!-- 🔒 EDIT LIST (PIN PROTECTED) -->
           <div class="action-icon"
             title="Edit List"
-            onclick="editList('${l.listId}')"
+            onclick="editList('${l.listId}', '${l.location}')"
             ${["VERIFIED","PASSED"].includes(l.status)
               ? 'style="pointer-events:none;opacity:.4"'
               : ""}
@@ -697,12 +697,12 @@ function renderLists(lists) {
             ✏
           </div>
 
+          <!-- PREVIEW (NO PIN) -->
           <div class="action-icon action-preview"
             title="Preview List"
             onclick="previewList('${l.listId}')">
             📄
           </div>
-
 
           ${
             l.status === "CLOSED"
@@ -714,9 +714,6 @@ function renderLists(lists) {
               : ""
           }
 
-
-
-
           ${
             l.status === "VERIFIED"
               ? `<div class="action-icon"
@@ -727,8 +724,6 @@ function renderLists(lists) {
               : ""
           }
 
-
-        
         </div>
       </td>
     `;
@@ -898,8 +893,12 @@ const LOCATION_PASSWORDS = {
   
 
 function verifyPinForLocation(location, onSuccess) {
-  const correctPin = LOCATION_PASSWORDS[location];
+  if (!location || !LOCATION_PASSWORDS[location]) {
+    showModal("❌ Access denied (invalid list location)");
+    return;
+  }
 
+  const correctPin = LOCATION_PASSWORDS[location];
   const enteredPin = prompt(`Enter PIN for ${location}`);
 
   if (enteredPin === null) return;
@@ -911,6 +910,7 @@ function verifyPinForLocation(location, onSuccess) {
 
   onSuccess();
 }
+
 
 
 function confirmCreateList() {
