@@ -545,17 +545,21 @@ tbody tr:hover {
       Select location for this list
     </p>
 
-    <div style="margin:14px 0;text-align:left">
-      <label style="display:block;margin-bottom:6px">
-        <input type="radio" name="listLocation" value="Branch">
-        Branch Office
-      </label>
-
-      <label style="display:block">
-        <input type="radio" name="listLocation" value="Head Office">
-        Head Office
-      </label>
+    <div style="margin:14px 0;text-align:left;max-height:240px;overflow:auto">
+    
+      <label><input type="radio" name="listLocation" value="DAMOH"> DAMOH</label><br>
+      <label><input type="radio" name="listLocation" value="DINDORI"> DINDORI</label><br>
+      <label><input type="radio" name="listLocation" value="ANUPPUR"> ANUPPUR</label><br>
+      <label><input type="radio" name="listLocation" value="MANDLA"> MANDLA</label><br>
+      <label><input type="radio" name="listLocation" value="NARSINGHPUR"> NARSINGHPUR</label><br>
+      <label><input type="radio" name="listLocation" value="SEONI"> SEONI</label><br>
+      <label><input type="radio" name="listLocation" value="KATNI"> KATNI</label><br>
+      <label><input type="radio" name="listLocation" value="BALAGHAT"> BALAGHAT</label><br>
+      <label><input type="radio" name="listLocation" value="JABALPUR BHL"> JABALPUR BHL</label><br>
+      <label><input type="radio" name="listLocation" value="JABALPUR HL"> JABALPUR HL</label><br>
+    
     </div>
+
 
     <div style="margin-top:16px">
       <button class="btn-primary" onclick="confirmCreateList()">Create</button>
@@ -871,21 +875,48 @@ function closeCreateListModal() {
 }
 
 
+
+const LOCATION_PASSWORDS = {
+  "DAMOH": "470776",
+  "DINDORI": "481880",
+  "ANUPPUR": "484224",
+  "MANDLA": "481661",
+  "NARSINGHPUR": "487001",
+  "SEONI": "480661",
+  "KATNI": "483501",
+  "BALAGHAT": "481001",
+  "JABALPUR BHL": "482001",
+  "JABALPUR HL": "482001"
+};
+
+  
+
 function confirmCreateList() {
   const selected = document.querySelector(
-    "input[name='listLocation']:checked"
+    'input[name="listLocation"]:checked'
   );
 
   if (!selected) {
-    showModal("Please select a location");
+    showModal("❌ Please select a location");
     return;
   }
 
-  closeCreateListModal();
+  const location = selected.value;
+  const correctPin = LOCATION_PASSWORDS[location];
 
-  // 🔑 THIS is the only place createList() is called
-  createList(selected.value);
+  const enteredPin = prompt(`Enter PIN for ${location}`);
+
+  if (enteredPin === null) return;
+
+  if (enteredPin !== correctPin) {
+    showModal("❌ Incorrect PIN");
+    return;
+  }
+
+  // ✅ PIN verified — continue existing flow
+  createList(location);
 }
+
 
 
 function toggleStatusFilter(e) {
