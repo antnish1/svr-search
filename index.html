@@ -891,6 +891,7 @@ const LOCATION_PASSWORDS = {
 
   
 
+<script>
 function confirmCreateList() {
   const selected = document.querySelector(
     'input[name="listLocation"]:checked'
@@ -906,16 +907,43 @@ function confirmCreateList() {
 
   const enteredPin = prompt(`Enter PIN for ${location}`);
 
-  if (enteredPin === null) return;
+  if (enteredPin === null) return; // user cancelled
 
   if (enteredPin !== correctPin) {
     showModal("❌ Incorrect PIN");
     return;
   }
 
-  // ✅ PIN verified — continue existing flow
-  createList(location);
+  // ✅ PIN VERIFIED — CREATE LIST
+  showLoader(true);
+
+  const cb = "create_" + Date.now();
+  let s;
+
+  window[cb] = function (listId) {
+    showLoader(false);
+
+    if (!listId || listId.error) {
+      showModal("❌ Failed to create list");
+      return;
+    }
+
+    // ✅ SAVE LIST ID & REDIRECT
+    sessionStorage.setItem("ACTIVE_LIST_ID", listId);
+    window.location.href = "home.html";
+  };
+
+  s = document.createElement("script");
+  s.src =
+    API_URL +
+    "?action=createList" +
+    "&location=" + encodeURIComponent(location) +
+    "&callback=" + cb;
+
+  document.body.appendChild(s);
 }
+</script>
+
 
 
 
