@@ -795,14 +795,20 @@ function createList(location) {
   document.body.appendChild(s);
 }
 
-function openList(id) {
-  sessionStorage.setItem("ACTIVE_LIST_ID", id);
-  window.location.href = "home.html?listId=" + id;
+function openList(listId, location) {
+  verifyPinForLocation(location, () => {
+    sessionStorage.setItem("ACTIVE_LIST_ID", listId);
+    window.location.href = "home.html";
+  });
 }
 
-function editList(id) {
-  window.location.href = "edit.html?listId=" + id;
+
+function editList(listId, location) {
+  verifyPinForLocation(location, () => {
+    window.location.href = "edit.html?listId=" + listId;
+  });
 }
+
 
 function previewList(id) {
   window.open(`${API_URL}?action=preview&listId=${id}`, "_blank");
@@ -891,6 +897,20 @@ const LOCATION_PASSWORDS = {
 
   
 
+function verifyPinForLocation(location, onSuccess) {
+  const correctPin = LOCATION_PASSWORDS[location];
+
+  const enteredPin = prompt(`Enter PIN for ${location}`);
+
+  if (enteredPin === null) return;
+
+  if (enteredPin !== correctPin) {
+    showModal("❌ Incorrect PIN");
+    return;
+  }
+
+  onSuccess();
+}
 
 
 function confirmCreateList() {
