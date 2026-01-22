@@ -892,6 +892,7 @@ const LOCATION_PASSWORDS = {
   
 
 
+
 function confirmCreateList() {
   const selected = document.querySelector(
     'input[name="listLocation"]:checked'
@@ -909,12 +910,23 @@ function confirmCreateList() {
 
   if (enteredPin === null) return; // user cancelled
 
+  // ❌ WRONG PIN
   if (enteredPin !== correctPin) {
-    showModal("❌ Incorrect PIN");
+    // 👇 CLOSE create list modal FIRST
+    closeCreateListModal();
+
+    // 👇 SHOW error popup ABOVE everything
+    setTimeout(() => {
+      showModal("❌ Incorrect PIN");
+    }, 50);
+
     return;
   }
 
-  // ✅ PIN VERIFIED — CREATE LIST
+  // ✅ CORRECT PIN
+  // 👇 CLOSE create list modal IMMEDIATELY
+  closeCreateListModal();
+
   showLoader(true);
 
   const cb = "create_" + Date.now();
@@ -928,7 +940,7 @@ function confirmCreateList() {
       return;
     }
 
-    // ✅ SAVE LIST ID & REDIRECT
+    // ✅ SAVE & REDIRECT
     sessionStorage.setItem("ACTIVE_LIST_ID", listId);
     window.location.href = "home.html";
   };
@@ -942,6 +954,8 @@ function confirmCreateList() {
 
   document.body.appendChild(s);
 }
+
+
 
 
 
