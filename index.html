@@ -5,6 +5,16 @@
 <title>TA DA VERIFICATION PORTAL</title>
 
 <style>
+
+
+#loginOverlay {
+  z-index: 20000; /* higher than everything */
+}
+
+
+
+
+  
 /* ================= DESIGN TOKENS ================= */
 :root {
   --yellow: #facc15;
@@ -571,6 +581,58 @@ tbody tr:hover {
 </div>
 
 
+
+<!-- ================= LOGIN MODAL ================= -->
+<div id="loginOverlay" class="modal-overlay show">
+  <div class="modal-box" style="max-width:360px;text-align:left">
+
+    <h3 style="margin-top:0;text-align:center">
+      🔐 Secure Login
+    </h3>
+
+    <p style="font-size:12px;color:#6b7280;text-align:center;margin-bottom:16px">
+      TA / DA Verification Portal
+    </p>
+
+    <div style="margin-bottom:12px">
+      <label style="font-size:12px;font-weight:600">Login ID</label>
+      <input
+        type="text"
+        id="loginId"
+        placeholder="Enter Login ID"
+        style="width:100%;padding:8px;margin-top:4px"
+      >
+    </div>
+
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;font-weight:600">Password</label>
+      <input
+        type="password"
+        id="loginPassword"
+        placeholder="Enter Password"
+        style="width:100%;padding:8px;margin-top:4px"
+      >
+    </div>
+
+    <div
+      id="loginError"
+      style="display:none;color:#b91c1c;font-size:12px;margin-bottom:10px"
+    >
+      ❌ Invalid Login ID or Password
+    </div>
+
+    <button
+      class="btn-primary"
+      style="width:100%"
+      onclick="handleLogin()"
+    >
+      Login
+    </button>
+
+  </div>
+</div>
+
+  
   
 </body>
 </html>
@@ -584,6 +646,39 @@ const API_URL =
 //loadLists();
 
 
+
+// ================= SIMPLE LOGIN CONFIG =================
+const LOGIN_CREDENTIALS = {
+  "admin": "admin123",
+  "manager": "manager123"
+};
+
+// ================= LOGIN HANDLER =================
+function handleLogin() {
+  const id = document.getElementById("loginId").value.trim();
+  const pass = document.getElementById("loginPassword").value.trim();
+  const error = document.getElementById("loginError");
+
+  if (LOGIN_CREDENTIALS[id] === pass) {
+    sessionStorage.setItem("LOGGED_IN", "true");
+    document.getElementById("loginOverlay").classList.remove("show");
+  } else {
+    error.style.display = "block";
+  }
+}
+
+// ================= BLOCK PAGE ON LOAD =================
+window.addEventListener("load", () => {
+  if (sessionStorage.getItem("LOGGED_IN") === "true") {
+    document.getElementById("loginOverlay").classList.remove("show");
+  }
+});
+
+
+
+
+
+  
 function loadAllLists() {
   const btn = document.getElementById("loadAllBtn");
 
