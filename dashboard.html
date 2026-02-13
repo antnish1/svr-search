@@ -72,26 +72,32 @@ button{
 
 table{
   width:100%;
-  border-collapse:collapse;
+  border-collapse:separate;
+  border-spacing:0;
   background:#fff;
-  border:2px solid #cbd5e1;
-  border-radius:8px;
-  overflow:hidden
-}
-
-th,td{
-  padding:8px;
-  border-bottom:1px solid #cbd5e1;
-  text-align:center
+  border-radius:12px;
+  overflow:hidden;
+  box-shadow:0 8px 20px rgba(0,0,0,.08);
 }
 
 th{
-  background:#e2e8f0;
-  font-size:12px
+  background:#f3f4f6;
+  font-size:12px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  font-weight:700;
+  padding:12px;
+}
+
+td{
+  padding:12px;
+  font-size:13px;
+  border-bottom:1px solid #e5e7eb;
 }
 
 tbody tr:hover{
-  background:#f1f5f9
+  background:#eef2ff;
+  transition:.15s ease;
 }
 
 .details{
@@ -119,6 +125,112 @@ tbody tr:hover{
   animation:spin 1s linear infinite
 }
 
+
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:linear-gradient(135deg,#1d4ed8,#2563eb);
+  color:#fff;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:20px;
+  box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+.header h1{
+  margin:0;
+  font-size:22px;
+  font-weight:800;
+}
+
+.header p{
+  margin:4px 0 0;
+  font-size:13px;
+  opacity:.9;
+}
+
+.btn-light{
+  background:#fff;
+  color:#1d4ed8;
+  font-weight:700;
+  border-radius:8px;
+}
+
+
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+  gap:18px;
+  margin-bottom:22px;
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:20px;
+  text-align:left;
+  box-shadow:0 10px 25px rgba(0,0,0,.08);
+  transition:.25s ease;
+  border:none;
+}
+
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 15px 35px rgba(0,0,0,.15);
+}
+
+.card h3{
+  font-size:12px;
+  color:#6b7280;
+  margin:0;
+  text-transform:uppercase;
+  letter-spacing:.5px;
+}
+
+.card div{
+  font-size:26px;
+  font-weight:800;
+  margin-top:8px;
+}
+
+  
+  
+.status-badge{
+  padding:4px 8px;
+  border-radius:20px;
+  font-size:11px;
+  font-weight:700;
+}
+
+.status-badge.VERIFIED{
+  background:#dcfce7;
+  color:#15803d;
+}
+
+.status-badge.PASSED{
+  background:#ede9fe;
+  color:#6d28d9;
+}
+
+
+.details{
+  margin-top:20px;
+  display:none;
+  animation:fadeIn .3s ease;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+
+  
+
+
+  
 @keyframes spin{
   to{transform:rotate(360deg)}
 }
@@ -130,18 +242,15 @@ tbody tr:hover{
 <div id="loader"><div class="spinner"></div></div>
 
 <!-- ===== HEADER ===== -->
-<div class="top" style="display:flex;justify-content:space-between;align-items:center">
+<div class="header">
   <div>
-    <h2 style="margin:0">TA / DA Dashboard</h2>
-    <div style="font-size:12px;color:#6b7280">
-      Verified & Passed Bills
-    </div>
+    <h1>TA / DA Reporting Dashboard</h1>
+    <p>Verified & Passed Bills Overview</p>
   </div>
 
-  <button onclick="goBack()" style="background:#e5e7eb;color:#111827">
-    ⬅ Back
-  </button>
+  <button class="btn-light" onclick="goBack()">⬅ Back</button>
 </div>
+
 
 <!-- ===== FILTERS ===== -->
 <div class="top">
@@ -164,11 +273,21 @@ tbody tr:hover{
 </div>
 
 <!-- ===== SUMMARY CARDS ===== -->
-<div class="cards">
-  <div class="card"><h3>Total Calls</h3><div id="c1">0</div></div>
-  <div class="card"><h3>Total TA+DA</h3><div id="c2">₹0</div></div>
-  <div class="card"><h3>Total Passed</h3><div id="c3">₹0</div></div>
+<div class="card" style="border-left:6px solid #1d4ed8">
+  <h3>Total Calls</h3>
+  <div id="c1">0</div>
 </div>
+
+<div class="card" style="border-left:6px solid #f59e0b">
+  <h3>Total TA+DA</h3>
+  <div id="c2">₹0</div>
+</div>
+
+<div class="card" style="border-left:6px solid #16a34a">
+  <h3>Total Passed</h3>
+  <div id="c3">₹0</div>
+</div>
+
 
 <!-- ===== ENGINEER SUMMARY ===== -->
 <table id="summary">
@@ -321,7 +440,12 @@ function showDetails(engineer){
         <td>${r.distance || ""}</td>
         <td>${r.svrNo || ""}</td>
         <td>${r.listId || ""}</td>
-        <td>${r.status || ""}</td>
+        <td>
+          <span class="status-badge ${r.status}">
+            ${r.status || ""}
+          </span>
+        </td>
+
         <td>${r.tada || ""}</td>
         <td>${r.passed || ""}</td>
       `;
