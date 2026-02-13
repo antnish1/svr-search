@@ -256,7 +256,22 @@ tbody tr:hover {
 }
 
   
+.modal-title {
+  font-size: 16px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #b91c1c;
+}
 
+.modal-message {
+  font-size: 13px;
+  line-height: 1.6;
+  color: #374151;
+}
+
+
+
+  
 .modal-overlay {
   display: none;
   position: fixed;
@@ -927,7 +942,12 @@ function verifyList(listId) {
   
 /* UI helpers */
 function showLoader(s){document.getElementById("loader").style.display=s?"flex":"none";}
-function showModal(t){document.getElementById("modal-text").innerText=t;document.getElementById("modal").style.display="flex";}
+  
+function showModal(htmlContent){
+  document.getElementById("modal-text").innerHTML = htmlContent;
+  document.getElementById("modal").style.display = "flex";
+}
+
 function closeModal(){document.getElementById("modal").style.display="none";}
 
 function renderStatus(status) {
@@ -967,9 +987,16 @@ function openCreateListModal() {
   const pendingLists = ALL_LISTS.filter(l => l.status !== "PASSED");
 
   if (pendingLists.length > 10) {
-    showModal(
-      "List Creation is not allowed, as there is more than 10 Lists are already pending to be marked as Passed.\n\nMark all the pending lists PASSED, before creating a new list."
-    );
+    showModal(`
+      <div class="modal-title">
+        ⚠️ List Creation Restricted
+      </div>
+      <div class="modal-message">
+        More than <b>10 lists</b> are currently pending to be marked as <b>"Passed"</b>.<br><br>
+        Please complete all pending approvals before creating a new list.
+      </div>
+    `);
+
     return;
   }
 
