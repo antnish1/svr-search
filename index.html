@@ -645,6 +645,7 @@ const API_URL =
 //showLoader(true);
 //loadLists();
 
+let ALL_LISTS = [];
 
 
 // ================= SIMPLE LOGIN CONFIG =================
@@ -718,6 +719,8 @@ function loadLists() {
 }
 
 function renderLists(lists) {
+  ALL_LISTS = lists || [];
+
   const tbody = document.querySelector("#listTable tbody");
   tbody.innerHTML = "";
 
@@ -959,13 +962,25 @@ function filterLists() {
 }
 
 function openCreateListModal() {
+
+  // 🔍 Count lists that are NOT PASSED
+  const pendingLists = ALL_LISTS.filter(l => l.status !== "PASSED");
+
+  if (pendingLists.length > 10) {
+    showModal(
+      "List Creation is not allowed, as there is more than 10 Lists are already pending to be marked as Passed.\n\nMark all the pending lists PASSED, before creating a new list."
+    );
+    return;
+  }
+
+  // ✅ If allowed → open modal
   document.getElementById("createListModal").classList.add("show");
 
-  // clear previous selection
   document
     .querySelectorAll("input[name='listLocation']")
     .forEach(r => r.checked = false);
 }
+
 
 function closeCreateListModal() {
   document.getElementById("createListModal").classList.remove("show");
