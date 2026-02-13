@@ -385,6 +385,11 @@ const engineerListEl = document.getElementById("engineerList");
 
 let cachedRows = [];
 
+let currentView = "locations";
+let cachedLocations = [];
+let cachedEngineers = [];
+
+  
 /* ===== DEFAULT DATES + AUTO LOAD ===== */
 (function init(){
   fromEl.value = "2025-12-01";
@@ -427,10 +432,104 @@ function render(d){
   c3.textContent="₹"+d.totals.passed.toLocaleString();
 
   cachedRows=d.rows;
+  cachedLocations=d.locations;
+  cachedEngineers=d.engineers;
 
-  populateEngineerList(d.engineers);
-  renderSummary(d.engineers);
+  renderLocations();
 }
+
+
+function renderLocations(){
+
+  currentView="locations";
+  const tb=document.querySelector("#summary tbody");
+  tb.innerHTML="";
+  details.style.display="none";
+
+  document.querySelector("#summary thead tr").innerHTML=`
+    <th>Location</th>
+    <th>Engineers</th>
+    <th>Calls</th>
+    <th>Total TA+DA</th>
+    <th>Total Passed</th>
+  `;
+
+  cachedLocations.forEach(l=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td style="cursor:pointer;color:#1d4ed8;font-weight:700"
+          onclick="renderEngineers('${l.location}')">
+        ${l.location}
+      </td>
+      <td>${l.engineerCount}</td>
+      <td>${l.calls}</td>
+      <td>₹${l.tada.toLocaleString()}</td>
+      <td>₹${l.passed.toLocaleString()}</td>
+    `;
+    tb.appendChild(tr);
+  });
+}
+
+
+function renderEngineers(location){
+
+  currentView="engineers";
+
+  const tb=document.querySelector("#summary tbody");
+  tb.innerHTML="";
+  details.style.display="none";
+
+  document.querySelector("#summary thead tr").innerHTML=`
+    <th>Engineer</th>
+    <th>Calls</th>
+    <th>Total TA+DA</th>
+    <th>Total Passed</th>
+  `;
+
+  const filtered = cachedEngineers.filter(e=>e.location===location);
+
+  filtered.forEach(e=>{
+    const tr=document.createElement("tr");
+    tr.innerHTML=`
+      <td style="cursor:pointer;color:#1d4ed8;font-weight:600"
+          onclick="showDetails('${e.engineer}')">
+        ${e.engineer}
+      </td>
+      <td>${e.calls}</td>
+      <td>₹${e.tada.toLocaleString()}</td>
+      <td>₹${e.passed.toLocaleString()}</td>
+    `;
+    tb.appendChild(tr);
+  });
+
+  addBackButton();
+}
+
+
+
+function addBackButton(){
+
+  const header=document.querySelector(".top-bar");
+
+  if(document.getElementById("locBack")) return;
+
+  const btn=document.createElement("button");
+  btn.id="locBack";
+  btn.className="btn-secondary";
+  btn.innerHTML="⬅ Back to Locations";
+  btn.style.marginRight="10px";
+
+  btn.onclick=function(){
+    this.remove();
+    renderLocations();
+  };
+
+  header.appendChild(btn);
+}
+
+  
+  
+  
 
 function populateEngineerList(engineers){
   engineerListEl.innerHTML="";
