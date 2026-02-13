@@ -175,12 +175,22 @@ th{
   text-align:center;
 }
 
+thead th{
+  position:sticky;
+  top:0;
+  z-index:5;
+  box-shadow:0 2px 4px rgba(0,0,0,0.08);
+}
+
+
+
+  
 /* Body left aligned */
 td{
   padding:9px;
   font-size:12px;
   border-bottom:1px solid var(--border);
-  text-align:left;
+  text-align:center;
 }
 
 tbody tr:nth-child(even){
@@ -191,6 +201,18 @@ tbody tr:hover{
   background:#e0f2fe;
 }
 
+
+/* Yellow left border for engineer summary rows */
+#summary tbody tr{
+  border-left:5px solid var(--yellow);
+}
+
+#summary tbody tr:hover{
+  background:#fffbea;
+}
+
+
+  
 /* ===== STATUS BADGES (Keep Yours) ===== */
 .status-badge{
   padding:4px 8px;
