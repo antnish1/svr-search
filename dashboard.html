@@ -428,8 +428,9 @@ function load(){
 
 function render(d){
   c1.textContent=d.totals.calls;
-  c2.textContent="₹"+d.totals.tada.toLocaleString();
-  c3.textContent="₹"+d.totals.passed.toLocaleString();
+  c2.textContent="₹"+Math.round(d.totals.tada).toLocaleString();
+  c3.textContent="₹"+Math.round(d.totals.passed).toLocaleString();
+
 
   cachedRows=d.rows;
   cachedLocations=d.locations;
@@ -463,8 +464,9 @@ function renderLocations(){
       </td>
       <td>${l.engineerCount}</td>
       <td>${l.calls}</td>
-      <td>₹${l.tada.toLocaleString()}</td>
-      <td>₹${l.passed.toLocaleString()}</td>
+      <td>₹${Math.round(l.tada).toLocaleString()}</td>
+      <td>₹${Math.round(l.passed).toLocaleString()}</td>
+
     `;
     tb.appendChild(tr);
   });
@@ -496,8 +498,9 @@ function renderEngineers(location){
         ${e.engineer}
       </td>
       <td>${e.calls}</td>
-      <td>₹${e.tada.toLocaleString()}</td>
-      <td>₹${e.passed.toLocaleString()}</td>
+      <td>₹${Math.round(e.tada).toLocaleString()}</td>
+      <td>₹${Math.round(e.passed).toLocaleString()}</td>
+
     `;
     tb.appendChild(tr);
   });
@@ -589,9 +592,10 @@ function showDetails(engineer){
             ${r.status || ""}
           </span>
         </td>
+        
+        <td>${r.tada ? Math.round(r.tada).toLocaleString() : ""}</td>
+        <td>${r.passed ? Math.round(r.passed).toLocaleString() : ""}</td>
 
-        <td>${r.tada || ""}</td>
-        <td>${r.passed || ""}</td>
       `;
 
       detailBody.appendChild(tr);
