@@ -997,14 +997,14 @@ function openCreateListModal() {
     // 🔍 Count lists that are NOT PASSED
     const pendingLists = lists.filter(l => l.status !== "PASSED");
 
-    if (pendingLists.length > 10) {
+    if (pendingLists.length > 25) {
 
       showModal(`
         <div class="modal-title">
           ⚠️ List Creation Restricted
         </div>
         <div class="modal-message">
-          More than <b>10 lists</b> are currently pending to be marked as <b>"Passed"</b>.<br><br>
+          More than <b>25 lists</b> are currently pending to be marked as <b>"Passed"</b>.<br><br>
           Please complete all pending approvals before creating a new list.
         </div>
       `);
