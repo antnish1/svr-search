@@ -231,6 +231,13 @@ tbody tr:hover{
   color:#6d28d9;
 }
 
+.status-badge.REJECTED{
+  background:#fecaca;
+  color:#991b1b;
+}
+
+  
+
 /* ===== DETAILS ANIMATION (Keep Yours) ===== */
 .details{
   margin-top:20px;
@@ -574,7 +581,17 @@ function showDetails(engineer){
   cachedRows
     .filter(r => r.engineer === engineer)
     .forEach(r => {
+
       const tr = document.createElement("tr");
+
+      // ===== CONDITION CHECK =====
+      let statusText = r.status || "";
+      let passedAmount = Number(r.passed) || 0;
+
+      if (statusText === "PASSED" && passedAmount === 0) {
+        statusText = "REJECTED";
+        tr.style.background = "#ffe4e6"; // light pink
+      }
 
       tr.innerHTML = `
         <td>${r.date || ""}</td>
@@ -588,19 +605,18 @@ function showDetails(engineer){
         <td>${r.svrNo || ""}</td>
         <td>${r.listId || ""}</td>
         <td>
-          <span class="status-badge ${r.status}">
-            ${r.status || ""}
+          <span class="status-badge ${statusText}">
+            ${statusText}
           </span>
         </td>
-        
         <td>${r.tada ? Math.round(r.tada).toLocaleString() : ""}</td>
-        <td>${r.passed ? Math.round(r.passed).toLocaleString() : ""}</td>
-
+        <td>${passedAmount ? Math.round(passedAmount).toLocaleString() : ""}</td>
       `;
 
       detailBody.appendChild(tr);
     });
 }
+
 
 
 function goBack(){
