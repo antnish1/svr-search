@@ -584,13 +584,20 @@ function showDetails(engineer){
 
       const tr = document.createElement("tr");
 
-      // ===== CONDITION CHECK =====
       let statusText = r.status || "";
       let passedAmount = Number(r.passed) || 0;
 
-      if (statusText === "PASSED" && passedAmount === 0) {
-        statusText = "REJECTED";
-        tr.style.background = "#ffe4e6"; // light pink
+      // ===== STATUS LOGIC =====
+      if (statusText === "PASSED") {
+
+        if (passedAmount === 0) {
+          // ❌ Reject if passed is zero
+          statusText = "REJECTED";
+          tr.style.background = "#ffe4e6"; // light pink
+        } else {
+          // ✅ Valid passed
+          tr.style.background = "#dcfce7"; // light green
+        }
       }
 
       tr.innerHTML = `
