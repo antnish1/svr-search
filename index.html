@@ -527,9 +527,18 @@ tbody tr:hover {
 
 </div>
 
-<p style="font-size:12px;color:#6b7280;margin-bottom:8px">
-  Click <b>Load All Lists</b> to fetch latest data
+<p style="font-size:12px;color:#6b7280;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;">
+  
+  <span>
+    Click <b>Load All Lists</b> to fetch latest data
+  </span>
+
+  <span id="statusSummary" style="font-weight:700;">
+    Open: 0 | Closed: 0 | Verified: 0 | Total Pending: 0
+  </span>
+
 </p>
+
 
 <!-- LIST TABLE -->
 <div class="card">
@@ -736,6 +745,29 @@ function loadLists() {
 
 function renderLists(lists) {
   ALL_LISTS = lists || [];
+
+
+
+ // ================= STATUS SUMMARY COUNT =================
+  const openCount = ALL_LISTS.filter(l => l.status === "OPEN").length;
+  const closedCount = ALL_LISTS.filter(l => l.status === "CLOSED").length;
+  const verifiedCount = ALL_LISTS.filter(l => l.status === "VERIFIED").length;
+  
+  // Total Pending = everything except PASSED
+  const totalPending = ALL_LISTS.filter(l => l.status !== "PASSED").length;
+  
+  const summaryBox = document.getElementById("statusSummary");
+  
+  if (summaryBox) {
+    summaryBox.innerHTML =
+      `Open: ${openCount} | ` +
+      `Closed: ${closedCount} | ` +
+      `Verified: ${verifiedCount} | ` +
+      `<span style="color:${totalPending > 25 ? '#b91c1c' : totalPending > 0 ? '#d97706' : '#15803d'}">
+        Total Pending: ${totalPending}
+       </span>`;
+  }
+ 
 
   const tbody = document.querySelector("#listTable tbody");
   tbody.innerHTML = "";
