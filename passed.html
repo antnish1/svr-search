@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Passed</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="api.js"></script>
+</head>
+
+<body>
+
+<h2>Mark Passed</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Engineer</th>
+      <th>Machine</th>
+      <th>TA+DA</th>
+      <th>Passed</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<button onclick="save()">Save</button>
+
+<script>
+let DATA = [];
+
+async function load() {
+  DATA = await getAllRows();
+  render(DATA);
+}
+
+function render(rows) {
+  tbody.innerHTML = "";
+
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${r.engineer_name}</td>
+      <td>${r.machine_no}</td>
+      <td>${r.total_tada}</td>
+      <td><input data-key="${r.unique_key}"></td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+async function save() {
+  const updates = [];
+
+  document.querySelectorAll("input").forEach(i => {
+    if (!i.value) return;
+
+    updates.push({
+      unique_key: i.dataset.key,
+      passed_amount: Number(i.value)
+    });
+  });
+
+  await updatePassedAmount(updates);
+  alert("Saved");
+}
+
+load();
+</script>
+
+</body>
+</html>
