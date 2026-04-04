@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dashboard</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="api.js"></script>
+</head>
+
+<body>
+
+<h2>Dashboard</h2>
+
+<div id="stats"></div>
+
+<script>
+async function load() {
+  const rows = await getAllRows();
+
+  const total = rows.length;
+  const tada = rows.reduce((s, r) => s + (r.total_tada || 0), 0);
+
+  stats.innerHTML = `
+    <h3>Total Calls: ${total}</h3>
+    <h3>Total TA+DA: ₹${tada}</h3>
+  `;
+}
+
+load();
+</script>
+
+</body>
+</html>
