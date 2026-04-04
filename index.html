@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TA DA Portal</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="api.js"></script>
+  <script src="utils.js"></script>
+</head>
+
+<body>
+
+<h2>Records</h2>
+
+<input id="machine" placeholder="Machine">
+<input id="engineer" placeholder="Engineer">
+<button onclick="load()">Search</button>
+
+<div id="loader">Loading...</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Engineer</th>
+      <th>Machine</th>
+      <th>Complaint</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+async function load() {
+  showLoader(true);
+
+  try {
+    const rows = await getFilteredRows({
+      machine: machine.value,
+      engineer: engineer.value
+    });
+
+    render(rows);
+  } catch (e) {
+    console.error(e);
+    alert("Error loading data");
+  }
+
+  showLoader(false);
+}
+
+function render(rows) {
+  tbody.innerHTML = "";
+
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+
+    tr.innerHTML = `
+      <td>${fmt(r.date)}</td>
+      <td>${r.engineer_name}</td>
+      <td>${r.machine_no}</td>
+      <td>${r.complaint}</td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
+load();
+</script>
+
+</body>
+</html>
