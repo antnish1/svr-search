@@ -4,7 +4,8 @@ const SUPABASE_KEY = "sb_publishable_e-gFkBqs2qG2bSs1iBJPrQ_m3PZf5lN";
 
 
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const { createClient } = window.supabase;
+const supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const form = document.getElementById("loginForm");
 const errorMsg = document.getElementById("errorMsg");
