@@ -1,76 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>TA DA Portal</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TA DA PORTAL</title>
 
-  <link rel="stylesheet" href="styles.css">
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
-  <script src="api.js"></script>
-  <script src="utils.js"></script>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<h2>Records</h2>
+  <div class="container">
+    <div class="login-card">
+      <h1>TA DA PORTAL</h1>
 
-<input id="machine" placeholder="Machine">
-<input id="engineer" placeholder="Engineer">
-<button onclick="load()">Search</button>
+      <form id="loginForm">
+        
+        <label>User</label>
+        <select id="username" required>
+          <option value="">Select User</option>
+          <option value="Nishant">Nishant</option>
+          <option value="Ankita">Ankita</option>
+          <option value="Ashish">Ashish</option>
+          <option value="Shweta">Shweta</option>
+        </select>
 
-<div id="loader">Loading...</div>
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Enter Password" required />
 
-<table>
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Engineer</th>
-      <th>Machine</th>
-      <th>Complaint</th>
-    </tr>
-  </thead>
-  <tbody id="tbody"></tbody>
-</table>
+        <button type="submit">Login</button>
 
-<script>
-async function load() {
-  showLoader(true);
+        <p id="errorMsg"></p>
+      </form>
+    </div>
+  </div>
 
-  try {
-    const rows = await getFilteredRows({
-      machine: machine.value,
-      engineer: engineer.value
-    });
-
-    render(rows);
-  } catch (e) {
-    console.error(e);
-    alert("Error loading data");
-  }
-
-  showLoader(false);
-}
-
-function render(rows) {
-  tbody.innerHTML = "";
-
-  rows.forEach(r => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${fmt(r.date)}</td>
-      <td>${r.engineer_name}</td>
-      <td>${r.machine_no}</td>
-      <td>${r.complaint}</td>
-    `;
-
-    tbody.appendChild(tr);
-  });
-}
-
-load();
-</script>
-
+  <!-- Supabase CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
