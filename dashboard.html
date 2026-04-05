@@ -1,36 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
-
-  <link rel="stylesheet" href="styles.css">
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase.js"></script>
-  <script src="api.js"></script>
+  <meta charset="UTF-8">
+  <title>TA DA Dashboard</title>
+  <link rel="stylesheet" href="dashboard.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-<h2>Dashboard</h2>
+<div class="dashboard">
 
-<div id="stats"></div>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h2>TA DA</h2>
 
-<script>
-async function load() {
-  const rows = await getAllRows();
+    <ul>
+      <li onclick="showSection('search')">🔍 Search</li>
+      <li onclick="showSection('new')">➕ New List</li>
+      <li onclick="showSection('reports')">📊 Reports</li>
+      <li onclick="logout()">🚪 Logout</li>
+    </ul>
+  </div>
 
-  const total = rows.length;
-  const tada = rows.reduce((s, r) => s + (r.total_tada || 0), 0);
+  <!-- MAIN CONTENT -->
+  <div class="main">
 
-  stats.innerHTML = `
-    <h3>Total Calls: ${total}</h3>
-    <h3>Total TA+DA: ₹${tada}</h3>
-  `;
-}
+    <!-- TOP BAR -->
+    <div class="topbar">
+      <input type="text" placeholder="Search..." />
+      <span id="usernameDisplay"></span>
+    </div>
 
-load();
-</script>
+    <!-- CONTENT AREA -->
+    <div class="content">
 
+      <div id="search" class="section active">
+        <h2>Search</h2>
+        <p>Search your TA/DA records here...</p>
+      </div>
+
+      <div id="new" class="section">
+        <h2>New List</h2>
+        <p>Create a new TA/DA entry...</p>
+      </div>
+
+      <div id="reports" class="section">
+        <h2>Reports</h2>
+        <p>View your reports here...</p>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script src="dashboard.js"></script>
 </body>
 </html>
