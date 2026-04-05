@@ -2,58 +2,96 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: 'Poppins', sans-serif;
 }
 
 body {
   height: 100vh;
   background: linear-gradient(135deg, #f9d423, #ff4e50);
+}
+
+/* MAIN LAYOUT */
+.main-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* LEFT PANEL */
+.left-panel {
+  flex: 1;
+  background: linear-gradient(135deg, #ff4e50, #f9d423);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+}
+
+.left-panel h1 {
+  font-size: 60px;
+  font-weight: 600;
+}
+
+.left-panel h2 {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+
+.left-panel p {
+  font-size: 16px;
+  opacity: 0.9;
+}
+
+/* RIGHT PANEL */
+.right-panel {
+  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.container {
-  width: 100%;
-  max-width: 400px;
-}
-
+/* LOGIN CARD */
 .login-card {
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(15px);
-  padding: 30px;
+  width: 350px;
+  padding: 35px;
   border-radius: 20px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.2);
-  color: #fff;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+  color: white;
+  animation: fadeIn 0.8s ease-in-out;
 }
 
-.login-card h1 {
+.login-card h2 {
   text-align: center;
   margin-bottom: 25px;
-  letter-spacing: 2px;
+}
+
+/* FORM */
+form {
+  display: flex;
+  flex-direction: column;
 }
 
 label {
-  display: block;
-  margin-top: 10px;
   font-size: 14px;
+  margin-top: 10px;
 }
 
 select, input {
-  width: 100%;
-  padding: 10px;
   margin-top: 5px;
+  padding: 12px;
+  border-radius: 10px;
   border: none;
-  border-radius: 8px;
   outline: none;
 }
 
+/* BUTTON */
 button {
-  width: 100%;
   margin-top: 20px;
-  padding: 12px;
+  padding: 14px;
+  border-radius: 12px;
   border: none;
-  border-radius: 10px;
   background: #ff4e50;
   color: white;
   font-size: 16px;
@@ -63,10 +101,23 @@ button {
 
 button:hover {
   background: #ff2e2e;
+  transform: scale(1.05);
 }
 
+/* ERROR */
 #errorMsg {
-  color: #fff;
   margin-top: 10px;
   text-align: center;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
